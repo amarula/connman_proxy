@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<node name="/">
+    <interface name="net.connman.Agent">
+
+        <!-- Methods -->
+          <method name="RequestInput"> 
+            <annotation name="org.freedesktop.DBus.GLib.Async" value="true"/> 
+            <arg name="service" type="o" direction="in"/> 
+            <arg name="fields" type="a{sv}" direction="in"/> 
+            <arg name="ret_fields" type="a{sv}" direction="out"/> 
+        </method> 
+
+        <method name="ReportError"> 
+            <annotation name="org.freedesktop.DBus.GLib.Async" value="true"/> 
+            <arg name="service" type="o" direction="in"/> 
+            <arg name="error" type="s" direction="in"/> 
+        </method> 
+
+        <method name="ReportPeerError"> 
+            <annotation name="org.freedesktop.DBus.GLib.Async" value="true"/> 
+            <arg name="peer" type="o" direction="in"/> 
+            <arg name="error" type="s" direction="in"/> 
+        </method> 
+
+        <method name="RequestBrowser"> 
+            <annotation name="org.freedesktop.DBus.GLib.Async" value="true"/> 
+            <arg name="service" type="o" direction="in"/> 
+            <arg name="url" type="s" direction="in"/> 
+        </method> 
+
+        <method name="Cancel"> 
+            <annotation name="org.freedesktop.DBus.GLib.Async" value=""/> 
+        </method> 
+
+        <method name="Release"> 
+            <annotation name="org.freedesktop.DBus.GLib.Async" value=""/> 
+        </method> 
+
+        <!-- Signals -->
+        
+        <!-- Properties -->
+    
+    </interface>
+</node>

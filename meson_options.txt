@@ -1,0 +1,23 @@
+############
+# Features #
+############
+
+########
+# Docs #
+########
+
+option('enable-docs',
+        type: 'boolean',
+        value: true,
+        description: 'Build Doxygen documentation if available'
+)
+
+############
+# Examples #
+############
+
+option('examples',
+        type : 'boolean',
+        value : true,
+        description: 'Wheter or not to build example programs'
+)

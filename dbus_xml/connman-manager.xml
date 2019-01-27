@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<node name="/">
+    <interface name="net.connman.Manager">
+
+        <!-- Methods -->
+        <method name="GetProperties">
+            <annotation name="org.freedesktop.DBus.GLib.Async" value="false"/> 
+            <arg name="properties" direction="out" type="a{sv}"/>
+        </method>
+        <method name="SetProperty">
+            <arg name="name" type="s" direction="in"/>
+            <arg name="value" type="v" direction="in"/>
+        </method>
+        <method name="GetTechnologies">
+            <annotation name="org.freedesktop.DBus.GLib.Async" value="false"/> 
+            <arg name="techs" direction="out" type="a(oa{sv})"/>
+        </method>
+        <method name="GetServices">
+            <annotation name="org.freedesktop.DBus.GLib.Async" value="false"/> 
+            <arg name="services" direction="out" type="a(oa{sv})"/>
+        </method>
+        <method name="RegisterAgent">
+            <annotation name="org.freedesktop.DBus.GLib.Async" value="true"/> 
+            <arg name="path" type="o" direction="in"/>
+        </method>
+        <method name="UnregisterAgent">
+            <arg name="path" type="o" direction="in"/>
+        </method>
+
+        <!-- Signals -->
+		<signal name="TechnologyAdded">
+			<arg type="o" name="path"/>
+			<arg type="a{sv}" name="properties"/>
+		</signal>
+		<signal name="TechnologyRemoved">
+			<arg type="o" name="path"/>
+		</signal>
+		<signal name="PropertyChanged">
+			<arg type="s" name="name"/>
+			<arg type="v" name="value"/>
+		</signal>
+		<signal name="ServicesChanged">
+			<arg type="a(oa{sv})" name="changedServiceList"/>
+			<arg type="ao" name="deletedService"/>
+		</signal>
+
+        <!-- Properties -->
+        <property name="State" type="s" access="read"/>
+        <property name="OfflineMode" type="b" access="readwrite"/>
+        <property name="SessionMode" type="b" access="readwrite"/>
+    
+    </interface>
+</node>
