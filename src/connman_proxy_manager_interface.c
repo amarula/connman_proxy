@@ -228,7 +228,7 @@ connman_proxy_mgr_technology_added_cb(NetConnmanManager *object, char *path, GVa
     CONNMAN_PROXY_UNUSED(object);
     CONNMAN_LOG_INFO("Added a new Technology with Path : %s\n", path);
     CONNMAN_UTIL_PRINT_G_VARIENT(path, properties);
-	connman_proxy_technology_add_new(connman_proxy_handler, path, properties);
+    connman_proxy_technology_add_new(connman_proxy_handler, path, properties);
 }
 
 void

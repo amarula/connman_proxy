@@ -42,7 +42,7 @@ s_connman_mgr_on_handle_request_input_cb (NetConnmanAgent *object, GDBusMethodIn
 
     connman_return_val_if_invalid_arg(connman_proxy_handler == NULL, FALSE);
 
-	connman_proxy_util_print_g_variant(connman_proxy_handler->agent_path, fields);
+    connman_proxy_util_print_g_variant(connman_proxy_handler->agent_path, fields);
     CONNMAN_LOG_USER("%s: Enter Password : ", service_obj_path ? service_obj_path :" Unknown Service");
     scanf("%s", value);
 

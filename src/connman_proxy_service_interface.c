@@ -154,16 +154,16 @@ s_connman_proxy_parse_service_properties(connman_proxy_service_info_t *service_o
         else if(strncmp(CONNMAN_PROP_IPV6_STR, prop_name, strlen(prop_name)) == 0) /*IPV6*/
         {
             connman_proxy_ipv6_info_t *ipv6 = &service_obj->ipv6;
-			if(strcmp(key, CONNMAN_PROP_METHOD_STR) == 0)
-				CONNMAN_VAR_GET_STR_COPY(res, &ipv6->method[0])
-			else if(strcmp(key, CONNMAN_PROP_ADDRESS_STR) == 0)
-				CONNMAN_VAR_GET_STR_COPY(res, &ipv6->address[0])
-			else if(strcmp(key, CONNMAN_PROP_PROXYLENTGH_STR) == 0)
-				CONNMAN_VAR_GET_BYTE(res, ipv6->prefix_length)
-			else if(strcmp(key, CONNMAN_PROP_GATEWAY_STR) == 0)
-				CONNMAN_VAR_GET_STR_COPY(res, &ipv6->gateway[0])
-			else if(strcmp(key, CONNMAN_PROP_PRIVACY_STR) == 0)
-				CONNMAN_VAR_GET_STR_COPY(res, &ipv6->privacy[0])
+            if(strcmp(key, CONNMAN_PROP_METHOD_STR) == 0)
+                CONNMAN_VAR_GET_STR_COPY(res, &ipv6->method[0])
+            else if(strcmp(key, CONNMAN_PROP_ADDRESS_STR) == 0)
+                CONNMAN_VAR_GET_STR_COPY(res, &ipv6->address[0])
+            else if(strcmp(key, CONNMAN_PROP_PROXYLENTGH_STR) == 0)
+                CONNMAN_VAR_GET_BYTE(res, ipv6->prefix_length)
+            else if(strcmp(key, CONNMAN_PROP_GATEWAY_STR) == 0)
+                CONNMAN_VAR_GET_STR_COPY(res, &ipv6->gateway[0])
+            else if(strcmp(key, CONNMAN_PROP_PRIVACY_STR) == 0)
+                CONNMAN_VAR_GET_STR_COPY(res, &ipv6->privacy[0])
         }
         else if(strncmp(CONNMAN_PROP_PROXY_STR, prop_name, strlen(prop_name)) == 0) /*Ethernet Proxy*/
         {
@@ -199,7 +199,7 @@ s_connman_proxy_service_connect_cb (GDBusProxy *proxy,
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-	connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
+    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_connect_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
@@ -221,7 +221,7 @@ s_connman_proxy_service_disconnect_cb (GDBusProxy *proxy,
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-	connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
+    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_disconnect_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
@@ -243,7 +243,7 @@ s_connman_proxy_service_remove_cb (GDBusProxy *proxy,
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-	connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
+    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_remove_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
@@ -265,7 +265,7 @@ s_connman_proxy_service_autoconnect_cb (GDBusProxy *proxy,
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-	connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
+    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
@@ -287,7 +287,7 @@ s_connman_proxy_service_mdns_cb (GDBusProxy *proxy,
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-	connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
+    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
@@ -309,7 +309,7 @@ s_connman_proxy_pv4_config_cb (GDBusProxy *proxy,
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-	connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
+    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
@@ -346,7 +346,7 @@ s_connman_proxy_nameserver_config_cb (GDBusProxy *proxy,
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-	connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
+    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
@@ -398,27 +398,27 @@ s_connman_proxy_srv_entry_free(gpointer data)
 
     if (service_obj != NULL)
     {
-		/* cleanup  members without child*/
-		CONNMAN_PROXY_SAFE_FREE(service_obj->service_name);
-		CONNMAN_PROXY_SAFE_FREE(service_obj->obj_path);
-		CONNMAN_PROXY_SAFE_FREE(service_obj->name);
+        /* cleanup  members without child*/
+        CONNMAN_PROXY_SAFE_FREE(service_obj->service_name);
+        CONNMAN_PROXY_SAFE_FREE(service_obj->obj_path);
+        CONNMAN_PROXY_SAFE_FREE(service_obj->name);
 
-		CONNMAN_PROXY_FREE_STR_GLIST(service_obj->nameservers);
-		CONNMAN_PROXY_FREE_STR_GLIST(service_obj->timeservers);
-		CONNMAN_PROXY_FREE_STR_GLIST(service_obj->domains);
-		CONNMAN_PROXY_FREE_STR_GLIST(service_obj->security);
+        CONNMAN_PROXY_FREE_STR_GLIST(service_obj->nameservers);
+        CONNMAN_PROXY_FREE_STR_GLIST(service_obj->timeservers);
+        CONNMAN_PROXY_FREE_STR_GLIST(service_obj->domains);
+        CONNMAN_PROXY_FREE_STR_GLIST(service_obj->security);
 
-		/* cleanup  members with child*/
-		CONNMAN_PROXY_FREE_STR_GLIST(service_obj->proxy.servers);
-		CONNMAN_PROXY_FREE_STR_GLIST(service_obj->proxy.exclude);
+        /* cleanup  members with child*/
+        CONNMAN_PROXY_FREE_STR_GLIST(service_obj->proxy.servers);
+        CONNMAN_PROXY_FREE_STR_GLIST(service_obj->proxy.exclude);
 
-		CONNMAN_PROXY_SAFE_FREE(service_obj->proxy.url);
+        CONNMAN_PROXY_SAFE_FREE(service_obj->proxy.url);
 
         g_object_unref(service_obj->srv_proxy);
 
-		/*Clean up main object*/
-		free(service_obj);
-	}
+        /*Clean up main object*/
+        free(service_obj);
+    }
     return;
 }
 
@@ -487,7 +487,7 @@ connman_proxy_service_add_new(connman_proxy_handler_t *connman_proxy_handler, gc
     service_obj = g_hash_table_lookup(connman_proxy_handler->services, obj_path);
     if(service_obj == NULL) /* New Service */
     {
-		CONNMAN_LOG_INFO("+++++++++++ A New Service Has Been Added +++++++++++ Path : %s\n", obj_path);
+        CONNMAN_LOG_INFO("+++++++++++ A New Service Has Been Added +++++++++++ Path : %s\n", obj_path);
         if((service_obj = g_new0(connman_proxy_service_info_t, 1)) == NULL)
         {
             CONNMAN_LOG_ERROR("Memory Allocation Failed : %s\n", obj_path);
@@ -635,8 +635,8 @@ int8_t
 connman_proxy_service_config_ipv4(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, char *method, char *addr, char *mask, char *gw)
 {
     int8_t ret = CONNMAN_PROXY_FAIL;
-	GVariantBuilder *ipv4_builder = NULL;
-	GVariant *dict = NULL;
+    GVariantBuilder *ipv4_builder = NULL;
+    GVariant *dict = NULL;
     connman_proxy_service_info_t *serv_obj = NULL;
 
     connman_return_val_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL || method == NULL, CONNMAN_PROXY_FAIL);
@@ -677,8 +677,8 @@ int8_t
 connman_proxy_service_config_nameserver(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, char **dns_list)
 {
     int8_t ret = CONNMAN_PROXY_FAIL;
-	GVariantBuilder *dns_builder = NULL;
-	GVariant *dict = NULL;
+    GVariantBuilder *dns_builder = NULL;
+    GVariant *dict = NULL;
     connman_proxy_service_info_t *serv_obj = NULL;
 
     connman_return_val_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL || dns_list == NULL, CONNMAN_PROXY_FAIL);
@@ -701,8 +701,8 @@ int8_t
 connman_proxy_service_config_timeserver(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, char **ntps_list)
 {
     int8_t ret = CONNMAN_PROXY_FAIL;
-	GVariantBuilder *ntps_builder = NULL;
-	GVariant *dict = NULL;
+    GVariantBuilder *ntps_builder = NULL;
+    GVariant *dict = NULL;
     connman_proxy_service_info_t *serv_obj = NULL;
 
     connman_return_val_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL || ntps_list == NULL, CONNMAN_PROXY_FAIL);
@@ -725,8 +725,8 @@ int8_t
 connman_proxy_service_config_domain(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, char **domain_list)
 {
     int8_t ret = CONNMAN_PROXY_FAIL;
-	GVariantBuilder *domain_builder = NULL;
-	GVariant *dict = NULL;
+    GVariantBuilder *domain_builder = NULL;
+    GVariant *dict = NULL;
     connman_proxy_service_info_t *serv_obj = NULL;
 
     connman_return_val_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL || domain_list == NULL, CONNMAN_PROXY_FAIL);
@@ -749,8 +749,8 @@ int8_t
 connman_proxy_service_config_proxy(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, char *method, char *url, char **server_list, char **exclude_list)
 {
     int8_t ret = CONNMAN_PROXY_FAIL;
-	GVariantBuilder *proxy_builder = NULL;
-	GVariant *dict = NULL;
+    GVariantBuilder *proxy_builder = NULL;
+    GVariant *dict = NULL;
     connman_proxy_service_info_t *serv_obj = NULL;
 
     connman_return_val_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL || method == NULL, CONNMAN_PROXY_FAIL);

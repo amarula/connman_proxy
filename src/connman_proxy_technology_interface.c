@@ -206,8 +206,8 @@ connman_proxy_technology_add_new(connman_proxy_handler_t *connman_proxy_handler,
 void
 connman_proxy_technology_remove(connman_proxy_handler_t *connman_proxy_handler, char *obj_path)
 {
-	GSList *path_node = NULL;
-	connman_proxy_technology_info_t *tech_obj = NULL;
+    GSList *path_node = NULL;
+    connman_proxy_technology_info_t *tech_obj = NULL;
 	
     connman_return_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL);
 
@@ -224,8 +224,8 @@ connman_proxy_technology_remove(connman_proxy_handler_t *connman_proxy_handler, 
 void
 connman_proxy_technology_scan(connman_proxy_handler_t *connman_proxy_handler, char *obj_path)
 {
-	GSList *path_node = NULL;
-	connman_proxy_technology_info_t *tech_obj = NULL;
+    GSList *path_node = NULL;
+    connman_proxy_technology_info_t *tech_obj = NULL;
 	
     connman_return_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL);
 
@@ -244,8 +244,8 @@ connman_proxy_technology_scan(connman_proxy_handler_t *connman_proxy_handler, ch
 void
 connman_proxy_technology_set_power(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, gboolean powered)
 {
-	GSList *path_node = NULL;
-	connman_proxy_technology_info_t *tech_obj = NULL;
+    GSList *path_node = NULL;
+    connman_proxy_technology_info_t *tech_obj = NULL;
 	
     connman_return_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL);
 

@@ -214,12 +214,12 @@ connman_proxy_deinit(connman_proxy_handler_t *connman_proxy_handler)
         if(connman_proxy_handler->service_changed_sid)
             g_signal_handler_disconnect(connman_proxy_handler->manager_proxy, connman_proxy_handler->service_changed_sid);
 
-		/* Cleanup Technologies*/
-		if(connman_proxy_handler->technologies)
-		{   
-			g_slist_foreach(connman_proxy_handler->technologies, (GFunc)connman_proxy_technology_cleanup, NULL);
-			g_slist_free(connman_proxy_handler->technologies);
-		}
+        /* Cleanup Technologies*/
+        if(connman_proxy_handler->technologies)
+        {
+            g_slist_foreach(connman_proxy_handler->technologies, (GFunc)connman_proxy_technology_cleanup, NULL);
+            g_slist_free(connman_proxy_handler->technologies);
+        }
 
         connman_proxy_service_deinit(connman_proxy_handler);
 
