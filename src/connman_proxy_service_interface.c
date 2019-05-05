@@ -51,6 +51,8 @@
             CONNMAN_VAR_GET_BOOL(value, service_obj->mdns) \
         else if(strcmp(key, CONNMAN_PROP_NAME_STR) == 0) \
             CONNMAN_VAR_GET_STR_DUP(value, service_obj->name) \
+        else if(strcmp(key, CONNMAN_PROP_STRENGTH_STR) == 0)\
+            CONNMAN_VAR_GET_BYTE(value, service_obj->signal_strength)\
         else if(strcmp(key, CONNMAN_PROP_IPV4_STR) == 0) \
         {\
             memset(&service_obj->ipv4, 0, sizeof(connman_proxy_ipv4_info_t)); /* clear existing data*/\
