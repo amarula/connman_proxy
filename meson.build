@@ -86,4 +86,5 @@ pkgconfig.generate(libraries : connman_proxy,
                     version : meson.project_version(),
                     name : 'connmanproxy',
                     filebase : 'connmanproxy',
-                    description : 'A Library to communicate with connman daemon')
+                    description : 'A Library to communicate with connman daemon',
+                    subdirs : 'connman_proxy')
