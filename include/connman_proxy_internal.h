@@ -24,6 +24,7 @@
 #ifndef __CONNMAN_PROXY_INTERNAL_H
 #define __CONNMAN_PROXY_INTERNAL_H
 
+#include <connman_proxy_gdbus_generated.h>
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 #define CP_EXPORT __attribute__ ((visibility("default")))

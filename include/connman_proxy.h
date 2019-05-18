@@ -25,7 +25,7 @@
 #define __CONNMAN_PROXY_H
 
 #include <inttypes.h>
-#include "connman_proxy_gdbus_generated.h"
+#include <gio/gio.h>
 
 #define  CONN_LOG_FATAL 1 /**< Only Fatal errors will be printed.*/
 #define  CONN_LOG_ERROR 2 /**< Only Errors will be printed including the Fatal error*/
@@ -153,7 +153,7 @@ typedef struct
  */
 typedef struct
 {
-    NetConnmanService *srv_proxy;   /**< Proxy object of the Connman Service interface*/
+    gpointer    srv_proxy;   /**< Proxy object of the Connman Service interface*/
     char        *obj_path;          /**< Object path of this service interface */
     char        *service_name;      /**< Name of the interface*/
     char        *name;              /**< SSID for Wifi */
@@ -181,7 +181,7 @@ typedef struct
  */
 typedef struct
 {
-    NetConnmanTechnology *tech_proxy;   /**< Proxy object of the connman Technlogy interface*/
+    gpointer tech_proxy;   /**< Proxy object of the connman Technlogy interface*/
     gchar *obj_path;                    /**< Object path of this Technlogy interface**/
     gchar *name;                        /**< Name of this Technlogy interface*/
     gchar *type;                        /**< Type of this Technlogy interface (ethernet, wifi etc) */
@@ -200,7 +200,7 @@ typedef struct
     GThread         *context_thread;    /**< Glib thread handler for main context*/
 
     /* Connman GDbus Proxy Objects*/
-    NetConnmanManager *manager_proxy;   /**< Proxy object of the connman Manager interface*/
+    gpointer        manager_proxy;       /**< Proxy object of the connman Manager interface*/
     guint           subscription_id;    /**< Id of the Glib dbus message/signal subscription*/
     guint           watcher_id;         /**< Id of the Glib dbus watcher*/
 
@@ -209,9 +209,9 @@ typedef struct
     gboolean        session_mode;       /**< Depricated*/
             
     /* Agent Manager parameters*/
-    char            *agent_path;        /**< Object path for agent manager interface*/
-    NetConnmanAgent *agent_mgr;         /**< Manager object for the agent service*/
     GDBusObjectManagerServer *agent_mgr_server; /**< Glib Dbugs manger object for agent service*/
+    gpointer        agent_mgr;         /**< Manager object for the agent service*/
+    gchar           *agent_path;        /**< Object path for agent manager interface*/
     gboolean        agent_registered;           /**< Tells whether agent is registered or not*/
     gulong          request_input_sid;          /**< Signal handler for request_input signal*/
     gulong          request_browser_sid;        /**< Signal handler for request_browser signal*/
