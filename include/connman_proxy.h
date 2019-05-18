@@ -205,6 +205,7 @@ typedef struct
     guint           watcher_id;         /**< Id of the Glib dbus watcher*/
 
     char            global_state [8];   /**< Main state of the network system. ("offline", "idle", "ready" and "online"). Where Online means We have internet connection*/
+    gboolean        service_available;   /**< Tells if the network service is available or not*/
     gboolean        offline_mode;       /**< Wheteher all interfaces disabled. Similar to airoplane mode*/
     gboolean        session_mode;       /**< Depricated*/
             

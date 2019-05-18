@@ -97,6 +97,7 @@ s_on_name_appeared (GDBusConnection *connection,
     connman_proxy_handler_t *connman_proxy_handler = (connman_proxy_handler_t *)user_data;
 
     CONNMAN_LOG_INFO("Connman Service is available now...\n");
+    connman_proxy_handler->service_available = TRUE;
     connman_proxy_handler->tech_added_sid = g_signal_connect (connman_proxy_handler->manager_proxy, "technology-added", G_CALLBACK (connman_proxy_mgr_technology_added_cb), connman_proxy_handler);
     connman_proxy_handler->tech_removed_sid = g_signal_connect (connman_proxy_handler->manager_proxy, "technology-removed", G_CALLBACK (connman_proxy_mgr_technology_removed_cb), connman_proxy_handler);
     connman_proxy_handler->service_changed_sid = g_signal_connect (connman_proxy_handler->manager_proxy, "services-changed", G_CALLBACK (connman_proxy_mgr_service_changed_cb), connman_proxy_handler);
@@ -127,7 +128,9 @@ s_on_name_vanished (GDBusConnection *connection,
                   const gchar     *name,
                   gpointer         user_data)
 {
+    connman_proxy_handler_t *connman_proxy_handler = (connman_proxy_handler_t *)user_data;
     CONNMAN_LOG_WARNING("Connman Service is un-available now...\n");
+    connman_proxy_handler->service_available = FALSE;
 }
 
 /**** Hidden ****/
