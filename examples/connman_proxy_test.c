@@ -254,6 +254,12 @@ s_select_service_from_list(connman_proxy_handler_t *connman_proxy_handler)
     connman_proxy_service_info_t **tmp_srv_list =  malloc(g_hash_table_size(connman_proxy_handler->services) * sizeof(connman_proxy_service_info_t*));
     connman_proxy_service_info_t *ret_srv = NULL;
 
+    if(connman_proxy_handler->services == NULL)
+    {
+        CONNMAN_LOG_WARNING("No services available yet!!!\n");
+        return ret_srv;
+    }
+
     CONNMAN_LOG_USER("\nSelect A Service From Below\n");
     g_hash_table_iter_init (&iter, connman_proxy_handler->services);
     while (g_hash_table_iter_next (&iter, &key, &value))

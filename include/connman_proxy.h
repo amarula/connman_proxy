@@ -144,8 +144,8 @@ typedef struct
 {
     char method[8];     /**< Method/Type of proxy  ("direct", "auto" and "manual")*/
     char *url;          /**< Automatic proxy configuration URL, used when method is auto, ignored when direct*/
-    GSList *servers;    /**< List of proxy servers like server.example.com:911. Used when method is manual, ignored when direct*/
-    GSList *exclude;    /**< List of hosts which can be accessed directly. Used when method is manual, ignored when direct.*/
+    GSList *servers;    /**< List of proxy servers like server.example.com:911. Used when method is manual, ignored when direct or auto*/
+    GSList *exclude;    /**< List of hosts which can be accessed directly. Used when method is manual, ignored when direct or auto*/
 }connman_proxy_proxy_info_t;
 
 /**

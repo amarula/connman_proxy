@@ -333,11 +333,16 @@ s_connman_proxy_proxy_config_cb (GDBusProxy *proxy,
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
+    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
     CONNMAN_LOG_WARNING("!!!!!!!!!! Not Implemented !!!!!!!!!!!!!!!!!!!!\n");
     CONNMAN_PROXY_UNUSED(proxy);
     CONNMAN_PROXY_UNUSED(res);
     CONNMAN_PROXY_UNUSED(user_data);
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
+    if(ret != TRUE)
+    {
+        CONNMAN_LOG_ERROR("Could Not Configure Proxy For Service %s : %s\n", service_obj ? service_obj->service_name : "Unknown", error->message);
+    }
     CONNMAN_PROXY_UNUSED(ret);
 }
 
@@ -791,6 +796,11 @@ connman_proxy_service_config_proxy(connman_proxy_handler_t *connman_proxy_handle
                 g_variant_builder_add (proxy_builder, "{sv}", CONNMAN_PROP_EXCLUDES_STR, g_variant_builder_end(arr_str_builder));
                 g_variant_builder_unref (arr_str_builder);
             }
+        }
+        else
+        {
+            CONNMAN_LOG_ERROR("Invalid Proxy Method selected : %s\n", method);
+            goto safe_exit;
         }
         dict = g_variant_builder_end (proxy_builder);
         net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_PROXY_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_proxy_config_cb, serv_obj);

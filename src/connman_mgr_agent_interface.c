@@ -132,7 +132,7 @@ connman_mgr_agent_init(connman_proxy_handler_t *connman_proxy_handler)
         goto safe_exit;
     }
 
-    connman_proxy_handler->agent_mgr =  net_connman_agent_skeleton_new ();
+    connman_proxy_handler->agent_mgr = net_connman_agent_skeleton_new ();
     if(connman_proxy_handler->agent_mgr == NULL)
     {
         CONNMAN_LOG_ERROR("xxxxxxxxxx Could Not Get Connman Agent manager xxxxxxxxxx\n");
@@ -179,6 +179,10 @@ connman_mgr_agent_deinit(connman_proxy_handler_t *connman_proxy_handler)
         g_free(connman_proxy_handler->agent_path);
         connman_proxy_handler->agent_path = NULL;
     }
+
+    if(connman_proxy_handler->agent_mgr_server)
+        g_object_unref(connman_proxy_handler->agent_mgr_server);
+
     /* Remove signal handlers*/
     if(connman_proxy_handler->request_input_sid)
         g_signal_handler_disconnect(connman_proxy_handler->agent_mgr, connman_proxy_handler->request_input_sid);
