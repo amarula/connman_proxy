@@ -144,7 +144,7 @@ connman_proxy_technology_property_changed_cb(NetConnmanTechnology *object, char 
     connman_return_if_invalid_arg(tech_obj == NULL);
 
     CONNMAN_PROXY_UNUSED(object);
-    CONNMAN_LOG_USER("[%s] Propert Changed : %s\n", (char *) tech_obj->obj_path, name);
+    CONNMAN_LOG_DEBUG("[%s] Property Changed : %s\n", (char *) tech_obj->obj_path, name);
     connman_proxy_util_print_g_variant(name, unboxed_value);
     CONNMAN_PROXY_TECH_PARSE_PROPERTY(tech_obj, name, unboxed_value);
 }
@@ -226,7 +226,6 @@ connman_proxy_technology_scan(connman_proxy_handler_t *connman_proxy_handler, ch
 {
     GSList *path_node = NULL;
     connman_proxy_technology_info_t *tech_obj = NULL;
-	
     connman_return_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL);
 
     if((path_node = g_slist_find_custom(connman_proxy_handler->technologies, obj_path, (GCompareFunc)s_connman_find_technology_by_path)))

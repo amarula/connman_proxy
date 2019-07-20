@@ -468,7 +468,7 @@ connman_proxy_service_property_changed_cb(NetConnmanService *object, char *name,
     connman_return_if_invalid_arg(service_obj == NULL);
     CONNMAN_PROXY_UNUSED(object);
 
-    CONNMAN_LOG_USER("[%s] Property Changed : %s\n", service_obj->service_name, name);
+    CONNMAN_LOG_DEBUG("[%s] Property Changed : %s\n", service_obj->service_name, name);
     CONNMAN_PROXY_SERVICE_PARSE_PROPERTY(service_obj, name, unboxed_value)
     connman_proxy_util_print_g_variant(name, unboxed_value);
 }

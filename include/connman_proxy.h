@@ -86,6 +86,7 @@
     #define CONNMAN_UTIL_PRINT_DICT_ARR(params)
 #endif
 
+/* User custom prints for developers for extra debugging */
 #define CONNMAN_LOG_USER(msg, args...) \
 	printf(msg, ## args);
 
@@ -158,7 +159,7 @@ typedef struct
     char        *service_name;      /**< Name of the interface*/
     char        *name;              /**< SSID for Wifi */
     char        type[16];           /**< Type of the network interface ("ethernet", "wifi" etc)*/
-    uint8_t     signal_strength;    /**< Signal strength. Not applicable for ethernet*/
+    uint8_t     signal_strength;    /**< Wifi Signal strength. Not applicable for ethernet*/
     char        state[16];          /**< Current state of this network interface ("idle", "failure", "association", "configuration", "ready", "disconnect" and "online")*/
     char        error[24];          /**< Stores the error message durig the error ("out-of-range", "pin-missing", "dhcp-failed", "connect-failed", "login-failed", "auth-failed" and "invalid-key")*/
     gboolean    favorite;           /**< True if ethernet cable is plugged or the user selected and succesfully connected to this network*/
@@ -181,7 +182,7 @@ typedef struct
  */
 typedef struct
 {
-    gpointer tech_proxy;   /**< Proxy object of the connman Technlogy interface*/
+    gpointer tech_proxy;                /**< Proxy object of the connman Technlogy interface*/
     gchar *obj_path;                    /**< Object path of this Technlogy interface**/
     gchar *name;                        /**< Name of this Technlogy interface*/
     gchar *type;                        /**< Type of this Technlogy interface (ethernet, wifi etc) */
@@ -200,18 +201,18 @@ typedef struct
     GThread         *context_thread;    /**< Glib thread handler for main context*/
 
     /* Connman GDbus Proxy Objects*/
-    gpointer        manager_proxy;       /**< Proxy object of the connman Manager interface*/
+    gpointer        manager_proxy;      /**< Proxy object of the connman Manager interface*/
     guint           subscription_id;    /**< Id of the Glib dbus message/signal subscription*/
     guint           watcher_id;         /**< Id of the Glib dbus watcher*/
 
     char            global_state [8];   /**< Main state of the network system. ("offline", "idle", "ready" and "online"). Where Online means We have internet connection*/
-    gboolean        service_available;   /**< Tells if the network service is available or not*/
+    gboolean        service_available;  /**< Tells if the network service is available or not*/
     gboolean        offline_mode;       /**< Wheteher all interfaces disabled. Similar to airoplane mode*/
     gboolean        session_mode;       /**< Depricated*/
             
     /* Agent Manager parameters*/
     GDBusObjectManagerServer *agent_mgr_server; /**< Glib Dbugs manger object for agent service*/
-    gpointer        agent_mgr;         /**< Manager object for the agent service*/
+    gpointer        agent_mgr;          /**< Manager object for the agent service*/
     gchar           *agent_path;        /**< Object path for agent manager interface*/
     gboolean        agent_registered;           /**< Tells whether agent is registered or not*/
     gulong          request_input_sid;          /**< Signal handler for request_input signal*/

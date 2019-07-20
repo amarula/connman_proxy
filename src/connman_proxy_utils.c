@@ -168,7 +168,7 @@ connman_proxy_util_print_services(connman_proxy_service_info_t *service)
 CP_EXPORT void
 connman_proxy_util_print_g_variant(char *name, GVariant *val)
 {
-#if defined(CONNMAN_LOG_LEVEL) && (CONNMAN_LOG_LEVEL > CONN_LOG_ERROR)
+#if defined(CONNMAN_LOG_LEVEL) && (CONNMAN_LOG_LEVEL > CONN_LOG_INFO)
     static uint8_t depth_level = 0;
     if(depth_level > MAX_DEPTH_LEVEL)
     {

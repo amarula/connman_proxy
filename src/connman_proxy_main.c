@@ -102,7 +102,7 @@ s_on_name_appeared (GDBusConnection *connection,
     connman_proxy_handler->tech_removed_sid = g_signal_connect (connman_proxy_handler->manager_proxy, "technology-removed", G_CALLBACK (connman_proxy_mgr_technology_removed_cb), connman_proxy_handler);
     connman_proxy_handler->service_changed_sid = g_signal_connect (connman_proxy_handler->manager_proxy, "services-changed", G_CALLBACK (connman_proxy_mgr_service_changed_cb), connman_proxy_handler);
 
-    /* Subscribe all PropertyChange event on dbus connection insteadof connecting "property-changed" to individual connection, this will make sure we ont miss any property-changed event*/
+    /* Subscribe all PropertyChange event on dbus connection insteadof connecting "property-changed" to individual connection, this will make sure we wont miss any property-changed event*/
     connman_proxy_handler->subscription_id = g_dbus_connection_signal_subscribe  (connman_proxy_handler->connection,
                                                          CONNMAN_SERVICE,
                                                          NULL,
@@ -129,8 +129,21 @@ s_on_name_vanished (GDBusConnection *connection,
                   gpointer         user_data)
 {
     connman_proxy_handler_t *connman_proxy_handler = (connman_proxy_handler_t *)user_data;
+
     CONNMAN_LOG_WARNING("Connman Service is un-available now...\n");
     connman_proxy_handler->service_available = FALSE;
+
+    /* Unsubscripe all property changed notifications first */
+    if(connman_proxy_handler->subscription_id)
+        g_dbus_connection_signal_unsubscribe (connman_proxy_handler->connection, connman_proxy_handler->subscription_id);
+
+    /* Remove signal handlers*/
+    if(connman_proxy_handler->tech_removed_sid)
+        g_signal_handler_disconnect(connman_proxy_handler->manager_proxy, connman_proxy_handler->tech_removed_sid);
+    if(connman_proxy_handler->tech_added_sid)
+        g_signal_handler_disconnect(connman_proxy_handler->manager_proxy, connman_proxy_handler->tech_added_sid);
+    if(connman_proxy_handler->service_changed_sid)
+        g_signal_handler_disconnect(connman_proxy_handler->manager_proxy, connman_proxy_handler->service_changed_sid);
 }
 
 /**** Hidden ****/
@@ -192,7 +205,8 @@ connman_proxy_init()
         CONNMAN_PROXY_SAFE_GFREE(connman_proxy_handler);
         goto safe_exit;
     }
-    
+
+    /* Manager for Connman agent.*/
     if(connman_mgr_agent_init(connman_proxy_handler) == FALSE)
     {
         CONNMAN_LOG_WARNING("!!!!!!!!!! Connman Agent manager Initialization Failed !!!!!!!!!! : Wireless Network Interfaces Will not work\n");
@@ -208,6 +222,10 @@ connman_proxy_deinit(connman_proxy_handler_t *connman_proxy_handler)
     if(connman_proxy_handler)
     {
         connman_mgr_agent_deinit(connman_proxy_handler);
+
+        /* Unsubscripe all property changed notifications first */
+        if(connman_proxy_handler->subscription_id)
+            g_dbus_connection_signal_unsubscribe (connman_proxy_handler->connection, connman_proxy_handler->subscription_id);
 
         /* Remove signal handlers*/
         if(connman_proxy_handler->tech_removed_sid)

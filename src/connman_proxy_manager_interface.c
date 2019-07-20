@@ -111,8 +111,9 @@ s_connman_proxy_mgr_offline_mode_cb (GDBusProxy *proxy,
     }
     else
     {
-        CONNMAN_LOG_ERROR("Couldnt %s Offline mode : %s\n", enabled ? "enabled":"disabled", error->message);
-        g_error_free (error);
+        CONNMAN_LOG_ERROR("Couldnt %s Offline mode : %s\n", enabled ? "enable":"disable", (error && error->message) ? error->message : "Unknown Reason");
+        if(error)
+            g_error_free (error);
     }
 }
 
@@ -157,7 +158,7 @@ s_connman_proxy_parse_global_system_properties(connman_proxy_handler_t *connman_
 
 /**** Hidden ****/
 
-/* Manger Signal Handlers*/
+/* Manager Signal Handlers*/
 void
 connman_proxy_mgr_service_changed_cb(NetConnmanManager *object, GVariant *added, GStrv removed, gpointer user_data)
 {
@@ -213,7 +214,7 @@ connman_proxy_mgr_property_changed_cb(NetConnmanManager *object, char *name, GVa
     connman_return_if_invalid_arg(connman_proxy_handler == NULL);
 
     CONNMAN_PROXY_UNUSED(object);
-    CONNMAN_LOG_INFO("Manager Propert Changed : %s\n", name);
+    CONNMAN_LOG_DEBUG("Manager Property Changed : %s\n", name);
     connman_proxy_util_print_g_variant(name, unboxed_value); 
     CONNMAN_PROXY_MGR_PARSE_SYSTEM_PROPERTY(connman_proxy_handler, name, unboxed_value);
 }
