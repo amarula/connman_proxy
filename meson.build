@@ -3,6 +3,8 @@ project('connman_proxy', 'c',
         license: 'LGPL2+'
     )
 
+compiler = meson.get_compiler('c')
+
 ###############
 # Directories #
 ###############
@@ -46,7 +48,10 @@ connman_proxy_compiler_flag  = ['-std=gnu99']
 connman_proxy_compiler_flag += ['-rdynamic', '-fvisibility=hidden']
 connman_proxy_compiler_flag += ['-Wall', '-Werror']
 connman_proxy_compiler_flag += ['-Wfloat-equal', '-Wformat=2', '-Wunreachable-code', '-Wundef', '-Winline', '-Wconversion', '-Wswitch', '-Wcast-align', '-Wimplicit', '-Wmissing-prototypes', '-Wshadow']
-connman_proxy_compiler_flag += ['-Wsign-conversion', '-Wimplicit-function-declaration', '-Wpointer-to-int-cast', '-Wint-to-pointer-cast', '-Wcast-function-type']
+connman_proxy_compiler_flag += ['-Wsign-conversion', '-Wimplicit-function-declaration', '-Wpointer-to-int-cast', '-Wint-to-pointer-cast']
+if compiler.has_argument('-Wcast-function-type')
+connman_proxy_compiler_flag += ['-Wcast-function-type']
+endif
 
 ##### Developer Compiler flags #####
 connman_proxy_compiler_flag += ['-g']
