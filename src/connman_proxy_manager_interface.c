@@ -102,8 +102,10 @@ s_connman_proxy_mgr_offline_mode_cb (GDBusProxy *proxy,
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
+    connman_proxy_handler_t *connman_proxy_handler =  (connman_proxy_handler_t *)user_data;
+
+    connman_return_if_invalid_arg(connman_proxy_handler == NULL);
     
-    CONNMAN_PROXY_UNUSED(user_data);
     ret = net_connman_manager_call_set_property_finish (NET_CONNMAN_MANAGER(proxy), res, &error);
     if(ret == TRUE)
     {
@@ -112,6 +114,7 @@ s_connman_proxy_mgr_offline_mode_cb (GDBusProxy *proxy,
     else
     {
         CONNMAN_LOG_ERROR("Couldnt %s Offline mode : %s\n", enabled ? "enable":"disable", (error && error->message) ? error->message : "Unknown Reason");
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_CONFIG_OFFLINE_MODE_ERROR);
         if(error)
             g_error_free (error);
     }
@@ -217,6 +220,26 @@ connman_proxy_mgr_property_changed_cb(NetConnmanManager *object, char *name, GVa
     CONNMAN_LOG_DEBUG("Manager Property Changed : %s\n", name);
     connman_proxy_util_print_g_variant(name, unboxed_value); 
     CONNMAN_PROXY_MGR_PARSE_SYSTEM_PROPERTY(connman_proxy_handler, name, unboxed_value);
+
+    /* Notify Callback */
+    if(connman_proxy_handler->notify_cb)
+    {
+        connman_proxy_notify_cb_data_t *notify_data = (connman_proxy_notify_cb_data_t*) malloc(sizeof(connman_proxy_notify_cb_data_t));
+        if(NULL == notify_data)
+            return;
+
+        if(strcmp(name, CONNMAN_PROP_OFFLINE_STR) == 0)
+        {
+            notify_data->notify_type = CONNMAN_PROXY_NOTIFY_OFFLINE_UPDATE;
+            notify_data->data.offline_enabled = connman_proxy_handler->offline_mode;
+        }
+        else if(strcmp(name, CONNMAN_PROP_STATE_STR) == 0)
+        {
+            notify_data->notify_type = CONNMAN_PROXY_NOTIFY_GLOBAL_STATE;
+            strncpy(notify_data->data.global_state, connman_proxy_handler->global_state, sizeof(notify_data->data.global_state));
+        }
+        connman_proxy_handler->notify_cb(notify_data, connman_proxy_handler->notify_cookie);
+    }
 }
 
 void

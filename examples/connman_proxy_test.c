@@ -63,6 +63,8 @@ static void s_connman_proxy_get_services(connman_proxy_handler_t *connman_proxy_
 static int32_t s_connman_get_single_key(void);
 void* connman_on_key_pressed(void *user_data);
 
+void connman_proxy_test_cb(connman_proxy_notify_cb_data_t *notification_data, gpointer cookie);
+
 /****** Test Inputs (NULL terminated)********/
 char *tmp_ip4[][5] = {
 						{"manual", "192.168.100.10", "255.255.255.0", "192.168.100.1", NULL},
@@ -278,6 +280,48 @@ s_select_service_from_list(connman_proxy_handler_t *connman_proxy_handler)
     return ret_srv;
 }
 
+void connman_proxy_test_cb(connman_proxy_notify_cb_data_t *notification_data, gpointer cookie)
+{
+    if(NULL == notification_data)
+        return;
+    switch(notification_data->notify_type)
+    {
+        case CONNMAN_PROXY_NOTIFY_CONNMAN_SERVICE_UPDATE:
+            CONNMAN_LOG_INFO("Connman Service is %s now\n", notification_data->data.service_available ? "Available" : "Unavailable");
+            break;
+        case CONNMAN_PROXY_NOTIFY_ERROR:
+            CONNMAN_LOG_ERROR("Error Code : %d\n", notification_data->data.error_code );
+            break;
+        case CONNMAN_PROXY_NOTIFY_OFFLINE_UPDATE:
+            CONNMAN_LOG_INFO("Offline Mode %s\n", notification_data->data.offline_enabled ? "Enabled" : "Disabled");
+            break;
+        case CONNMAN_PROXY_NOTIFY_GLOBAL_STATE:
+            CONNMAN_LOG_INFO("Global state Updated : %s\n", notification_data->data.global_state);
+            break;
+        case CONNMAN_PROXY_NOTIFY_SERVICE_UPDATE:
+            CONNMAN_LOG_INFO("Interface [%s] Service [%s] Updated : [%s] [%s] [%hhu %%]\n",
+                            notification_data->data.serv.interface, (notification_data->data.serv.name) ?notification_data->data.serv.name : "-",
+                            notification_data->data.serv.state, notification_data->data.serv.type, notification_data->data.serv.signal_strength);
+            if(notification_data->data.serv.name)
+                g_free(notification_data->data.serv.name);
+            break;
+        case CONNMAN_PROXY_NOTIFY_TECH_UPDATE:
+            CONNMAN_LOG_INFO("[%s] Updated : \[%spowered ] [ %sconnected ]\n",
+                            notification_data->data.tech.type ? notification_data->data.tech.type : "Unknown",
+                            notification_data->data.tech.powered ? " ": " Not ", notification_data->data.tech.connected ? " ": " Not ");
+            if(notification_data->data.tech.type)
+                g_free(notification_data->data.tech.type );
+            break;
+        case CONNMAN_PROXY_NOTIFY_SCAN_COMPLETED:
+            CONNMAN_LOG_INFO("WiFi Scan Completed\n");
+            break;
+        default:
+            CONNMAN_LOG_WARNING("!!!!!!!!!! Noification %d Not Handled !!!!!!!!!!\n", notification_data->notify_type);
+            break;
+    }
+    free(notification_data);
+}
+
 void * connman_on_key_pressed(void *user_data)
 {
     int32_t c = 0;
@@ -448,7 +492,7 @@ int main(int argc,char *argv[])
 {
     connman_proxy_handler_t *connman_proxy_handler = NULL;
 
-    connman_proxy_handler = connman_proxy_init();
+    connman_proxy_handler = connman_proxy_init(connman_proxy_test_cb, NULL);
     if(connman_proxy_handler == NULL)
     {
         CONNMAN_LOG_ERROR("xxxxxxxxxx Connman Proxy Init failed xxxxxxxxxx\n");

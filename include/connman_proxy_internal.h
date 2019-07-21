@@ -161,6 +161,8 @@ void connman_proxy_util_print_array_of_dict(GVariant *res);
 void connman_proxy_util_print_array_of_string(GVariant *res);
 void connman_proxy_util_print_custom(GVariant *res);
 void connman_proxy_g_free(gpointer data, gpointer user_data);
+void connman_proxy_util_notify_error_cb(connman_proxy_handler_t *connman_proxy_handler, connman_proxy_error_type_t error_code);
+void connman_proxy_util_notify_connman_service_cb(connman_proxy_handler_t *connman_proxy_handler, gboolean available);
 
 /* Service APIs */
 void connman_proxy_service_init(connman_proxy_handler_t *connman_proxy_handler);
@@ -171,7 +173,7 @@ void connman_proxy_service_remove(connman_proxy_handler_t *connman_proxy_handler
 void connman_proxy_service_remove_from_table(connman_proxy_handler_t *connman_proxy_handler, char *service_name);
 void connman_proxy_service_set_autoconnect(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, gboolean autoconnect);
 void connman_proxy_service_set_mdns(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, gboolean enable);
-void connman_proxy_service_property_changed_cb(NetConnmanService *object, char *name, GVariant *value, gpointer user_data);
+void connman_proxy_service_property_changed_cb(NetConnmanService *object, connman_proxy_handler_t *connman_proxy_handler, char *name, GVariant *value, gpointer user_data);
 int8_t connman_proxy_service_add_new(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, GVariant *params);
 int8_t connman_proxy_service_config_ipv4(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, char *method, char *addr, char *mask, char *gw);
 int8_t connman_proxy_service_config_ipv6(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, char *method, char *addr, uint8_t prefix_len, char *gw, char *privacy);
@@ -200,7 +202,7 @@ void connman_proxy_technology_cleanup(gpointer free_obj, gpointer user_data);
 void connman_proxy_technology_remove(connman_proxy_handler_t *connman_proxy_handler, char *obj_path);
 void connman_proxy_technology_add_new(connman_proxy_handler_t *connman_proxy_handler, gchar *obj_path, GVariant *res);
 void connman_proxy_technology_set_power(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, gboolean powered);
-void connman_proxy_technology_property_changed_cb(NetConnmanTechnology *object, char *name, GVariant *value, gpointer user_data);
+void connman_proxy_technology_property_changed_cb(NetConnmanTechnology *object, connman_proxy_handler_t *connman_proxy_handler, char *name, GVariant *value, gpointer user_data);
 connman_proxy_technology_info_t * connman_proxy_technology_find_by_path(connman_proxy_handler_t *connman_proxy_handler, const gchar *object_path);
 
 /* Agent managr APIs*/

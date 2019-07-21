@@ -38,6 +38,40 @@ char *s_depth_tab_str = "\t\t\t\t\t\t\t\t\t\t";
 /**** Hidden ****/
 
 void
+connman_proxy_util_notify_error_cb(connman_proxy_handler_t *connman_proxy_handler, connman_proxy_error_type_t error_code)
+{
+    connman_return_if_invalid_arg(NULL == connman_proxy_handler);
+
+    if(connman_proxy_handler->notify_cb)
+    {
+        connman_proxy_notify_cb_data_t *notify_data = (connman_proxy_notify_cb_data_t*) malloc(sizeof(connman_proxy_notify_cb_data_t));
+        if(NULL == notify_data)
+            return;
+
+        notify_data->notify_type = CONNMAN_PROXY_NOTIFY_ERROR;
+        notify_data->data.error_code = error_code;
+        connman_proxy_handler->notify_cb(notify_data, connman_proxy_handler->notify_cookie);
+    }
+}
+
+void
+connman_proxy_util_notify_connman_service_cb(connman_proxy_handler_t *connman_proxy_handler, gboolean available)
+{
+    connman_return_if_invalid_arg(NULL == connman_proxy_handler);
+
+    if(connman_proxy_handler->notify_cb)
+    {
+        connman_proxy_notify_cb_data_t *notify_data = (connman_proxy_notify_cb_data_t*) malloc(sizeof(connman_proxy_notify_cb_data_t));
+        if(NULL == notify_data)
+            return;
+
+        notify_data->notify_type = CONNMAN_PROXY_NOTIFY_CONNMAN_SERVICE_UPDATE;
+        notify_data->data.service_available = available;
+        connman_proxy_handler->notify_cb(notify_data, connman_proxy_handler->notify_cookie);
+    }
+}
+
+void
 connman_proxy_util_print_array_of_string(GVariant *res)
 {
     GVariantIter iter;

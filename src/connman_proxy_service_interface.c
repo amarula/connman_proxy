@@ -197,205 +197,240 @@ s_connman_proxy_parse_service_properties(connman_proxy_service_info_t *service_o
 static void
 s_connman_proxy_service_connect_cb (GDBusProxy *proxy,
                                 GAsyncResult *res,
-                                gpointer      user_data)
+                                connman_proxy_handler_t *connman_proxy_handler)
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_connect_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
     {
-        CONNMAN_LOG_INFO("Connected to Service %s\n", service_obj ? service_obj->service_name : "Unknown" );
+        CONNMAN_LOG_INFO("Connected to Service %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown" );
     }
     else
     {
-        CONNMAN_LOG_ERROR("Could Not Connect to Service %s : %s\n", service_obj ? service_obj->service_name : "Unknown", error->message);
-        g_error_free (error);
+        CONNMAN_LOG_ERROR("Could Not Connect to Service %s : %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown", error->message);
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_SERVICE_CONNECT_ERROR);
+        if(error)
+            g_error_free (error);
     }
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     return;
 }
 
 static void
 s_connman_proxy_service_disconnect_cb (GDBusProxy *proxy,
                                 GAsyncResult *res,
-                                gpointer      user_data)
+                                connman_proxy_handler_t *connman_proxy_handler)
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_disconnect_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
     {
-        CONNMAN_LOG_INFO("Disconnected Service %s\n", service_obj ? service_obj->service_name : "Unknown" );
+        CONNMAN_LOG_INFO("Disconnected Service %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown" );
     }
     else
     {
-        CONNMAN_LOG_ERROR("Could Not Disconnect Service %s : %s\n", service_obj ? service_obj->service_name : "Unknown", error->message);
-        g_error_free (error);
+        CONNMAN_LOG_ERROR("Could Not Disconnect Service %s : %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown", error->message);
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_SERVICE_DISCONNECT_ERROR);
+        if(error)
+            g_error_free (error);
     }
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     return;
 }
 
 static void
 s_connman_proxy_service_remove_cb (GDBusProxy *proxy,
                                 GAsyncResult *res,
-                                gpointer      user_data)
+                                connman_proxy_handler_t *connman_proxy_handler)
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_remove_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
     {
-        CONNMAN_LOG_INFO("Forgot Service %s\n", service_obj ? service_obj->service_name : "Unknown" );
+        CONNMAN_LOG_INFO("Forgot Service %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown" );
     }
     else
     {
-        CONNMAN_LOG_ERROR("Could Not Forget Service %s : %s\n", service_obj ? service_obj->service_name : "Unknown", error->message);
-        g_error_free (error);
+        CONNMAN_LOG_ERROR("Could Not Forget Service %s : %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown", error->message);
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_SERVICE_REMOVE_ERROR);
+        if(error)
+            g_error_free (error);
     }
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     return;
 }
 
 static void
 s_connman_proxy_service_autoconnect_cb (GDBusProxy *proxy,
                                 GAsyncResult *res,
-                                gpointer      user_data)
+                                connman_proxy_handler_t *connman_proxy_handler)
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
     {
-        CONNMAN_LOG_INFO("Configured Autoconnect For Service %s\n", service_obj ? service_obj->service_name : "Unknown" );
+        CONNMAN_LOG_INFO("Configured Autoconnect For Service %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown" );
     }
     else
     {
-        CONNMAN_LOG_ERROR("Could Not Configure Autoconnect For Service %s : %s\n", service_obj ? service_obj->service_name : "Unknown", error->message);
-        g_error_free (error);
+        CONNMAN_LOG_ERROR("Could Not Configure Autoconnect For Service %s : %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown", error->message);
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_CONFIG_AUTOCONNECT_ERROR);
+        if(error)
+            g_error_free (error);
     }
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     return;
 }
 
 static void
 s_connman_proxy_service_mdns_cb (GDBusProxy *proxy,
                                 GAsyncResult *res,
-                                gpointer      user_data)
+                                connman_proxy_handler_t *connman_proxy_handler)
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
     {
-        CONNMAN_LOG_INFO("Configured MDNS For Service %s\n", service_obj ? service_obj->service_name : "Unknown" );
+        CONNMAN_LOG_INFO("Configured MDNS For Service %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown" );
     }
     else
     {
-        CONNMAN_LOG_ERROR("Could Not Configure MDNS For Service %s : %s\n", service_obj ? service_obj->service_name : "Unknown", error->message);
-        g_error_free (error);
+        CONNMAN_LOG_ERROR("Could Not Configure MDNS For Service %s : %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown", error->message);
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_CONFIG_MDNS_ERROR);
+        if(error)
+            g_error_free (error);
     }
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     return;
 }
 
 static void
-s_connman_proxy_pv4_config_cb (GDBusProxy *proxy,
+s_connman_proxy_ipv4_config_cb (GDBusProxy *proxy,
                                 GAsyncResult *res,
-                                gpointer      user_data)
+                                connman_proxy_handler_t *connman_proxy_handler)
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
     {
-        CONNMAN_LOG_INFO("Configured IPV4 For Service %s\n", service_obj ? service_obj->service_name : "Unknown" );
+        CONNMAN_LOG_INFO("Configured IPV4 For Service %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown" );
     }
     else
     {
-        CONNMAN_LOG_ERROR("Could Not Configure IPV4 For Service %s : %s\n", service_obj ? service_obj->service_name : "Unknown", error->message);
-        g_error_free (error);
+        CONNMAN_LOG_ERROR("Could Not Configure IPV4 For Service %s : %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown", error->message);
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_CONFIG_IPV4_ERROR);
+        if(error)
+            g_error_free (error);
     }
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     return;
 }
 
 static void
 s_connman_proxy_proxy_config_cb (GDBusProxy *proxy,
                                 GAsyncResult *res,
-                                gpointer      user_data)
+                                connman_proxy_handler_t *connman_proxy_handler)
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
-    CONNMAN_LOG_WARNING("!!!!!!!!!! Not Implemented !!!!!!!!!!!!!!!!!!!!\n");
-    CONNMAN_PROXY_UNUSED(proxy);
-    CONNMAN_PROXY_UNUSED(res);
-    CONNMAN_PROXY_UNUSED(user_data);
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret != TRUE)
     {
-        CONNMAN_LOG_ERROR("Could Not Configure Proxy For Service %s : %s\n", service_obj ? service_obj->service_name : "Unknown", error->message);
+        CONNMAN_LOG_ERROR("Could Not Configure Proxy For Service %s : %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown", error->message);
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_CONFIG_PROXY_ERROR);
+        if(error)
+            g_error_free (error);
     }
-    CONNMAN_PROXY_UNUSED(ret);
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
 }
 
 static void
 s_connman_proxy_nameserver_config_cb (GDBusProxy *proxy,
                                 GAsyncResult *res,
-                                gpointer      user_data)
+                                connman_proxy_handler_t *connman_proxy_handler)
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-    connman_proxy_service_info_t *service_obj = (connman_proxy_service_info_t *)user_data;
 
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
     if(ret == TRUE)
     {
-        CONNMAN_LOG_INFO("Configured NameServer For Service %s\n", service_obj ? service_obj->service_name : "Unknown" );
+        CONNMAN_LOG_INFO("Configured NameServer For Service %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown" );
     }
     else
     {
-        CONNMAN_LOG_ERROR("Could Not Configure NameServer For Service %s : %s\n", service_obj ? service_obj->service_name : "Unknown", error->message);
-        g_error_free (error);
+        CONNMAN_LOG_ERROR("Could Not Configure NameServer For Service %s : %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown", error->message);
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_CONFIG_DNS_ERROR);
+        if(error)
+            g_error_free (error);
     }
-    return;
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
 }
 
 static void
 s_connman_proxy_timeserver_config_cb (GDBusProxy *proxy,
                                 GAsyncResult *res,
-                                gpointer      user_data)
+                                connman_proxy_handler_t *connman_proxy_handler)
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-    CONNMAN_LOG_WARNING("!!!!!!!!!! Not Implemented !!!!!!!!!!!!!!!!!!!!\n");
-    CONNMAN_PROXY_UNUSED(proxy);
-    CONNMAN_PROXY_UNUSED(res);
-    CONNMAN_PROXY_UNUSED(user_data);
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
-    CONNMAN_PROXY_UNUSED(ret);
+    if(ret == TRUE)
+    {
+        CONNMAN_LOG_INFO("Configured TimeServer For Service %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown" );
+    }
+    else
+    {
+        CONNMAN_LOG_ERROR("Could Not Configure TimeServer For Service %s : %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown", error->message);
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_CONFIG_NTPS_ERROR);
+        if(error)
+            g_error_free (error);
+    }
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
 }
 
 static void
 s_connman_proxy_domain_config_cb (GDBusProxy *proxy,
                                 GAsyncResult *res,
-                                gpointer      user_data)
+                                connman_proxy_handler_t *connman_proxy_handler)
 {
     GError *error = NULL;
     gboolean ret  =  FALSE;
-    CONNMAN_LOG_WARNING("!!!!!!!!!! Not Implemented !!!!!!!!!!!!!!!!!!!!\n");
-    CONNMAN_PROXY_UNUSED(proxy);
-    CONNMAN_PROXY_UNUSED(res);
-    CONNMAN_PROXY_UNUSED(user_data);
     ret = net_connman_service_call_set_property_finish (NET_CONNMAN_SERVICE(proxy), res, &error);
-    CONNMAN_PROXY_UNUSED(ret);
+    if(ret == TRUE)
+    {
+        CONNMAN_LOG_INFO("Configured Domains[s] For Service %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown" );
+    }
+    else
+    {
+        CONNMAN_LOG_ERROR("Could Not Configure Domain[s] For Service %s : %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 : "Unknown", error->message);
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_CONFIG_DOMAIN_ERROR);
+        if(error)
+            g_error_free (error);
+    }
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
 }
 
 static void
@@ -459,7 +494,7 @@ connman_proxy_service_deinit(connman_proxy_handler_t *connman_proxy_handler)
 }
 
 void
-connman_proxy_service_property_changed_cb(NetConnmanService *object, char *name, GVariant *unboxed_value, gpointer user_data)
+connman_proxy_service_property_changed_cb(NetConnmanService *object, connman_proxy_handler_t *connman_proxy_handler, char *name, GVariant *unboxed_value, gpointer user_data)
 {
     gsize str_len = 0; /* str_len and str_val To be used in PARSE macro, same name will be used in macro*/
     const gchar *str_val = NULL;
@@ -471,6 +506,24 @@ connman_proxy_service_property_changed_cb(NetConnmanService *object, char *name,
     CONNMAN_LOG_DEBUG("[%s] Property Changed : %s\n", service_obj->service_name, name);
     CONNMAN_PROXY_SERVICE_PARSE_PROPERTY(service_obj, name, unboxed_value)
     connman_proxy_util_print_g_variant(name, unboxed_value);
+
+    /* Notify Callback */
+    if(connman_proxy_handler->notify_cb)
+    {
+        connman_proxy_notify_cb_data_t *notify_data = (connman_proxy_notify_cb_data_t*) malloc(sizeof(connman_proxy_notify_cb_data_t));
+        if(NULL == notify_data)
+            return;
+
+        notify_data->notify_type = CONNMAN_PROXY_NOTIFY_SERVICE_UPDATE;
+
+        notify_data->data.serv.name = service_obj->name ? g_strdup(service_obj->name) : NULL;
+        strncpy(notify_data->data.serv.interface, service_obj->eth.interface, sizeof(notify_data->data.serv.interface));
+        strncpy(notify_data->data.serv.type, service_obj->type, sizeof(notify_data->data.serv.type));
+        strncpy(notify_data->data.serv.state, service_obj->state, sizeof(notify_data->data.serv.state));
+        notify_data->data.serv.signal_strength = service_obj->signal_strength;
+
+        connman_proxy_handler->notify_cb(notify_data, connman_proxy_handler->notify_cookie);
+    }
 }
 
 int8_t
@@ -571,7 +624,8 @@ connman_proxy_service_connect(connman_proxy_handler_t *connman_proxy_handler, ch
         goto safe_exit;
     }
 
-    net_connman_service_call_connect(serv_obj->srv_proxy, NULL, (GAsyncReadyCallback)s_connman_proxy_service_connect_cb, serv_obj);
+    connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
+    net_connman_service_call_connect(serv_obj->srv_proxy, NULL, (GAsyncReadyCallback)s_connman_proxy_service_connect_cb, connman_proxy_handler);
 
 safe_exit:
     return;
@@ -591,7 +645,8 @@ connman_proxy_service_disconnect(connman_proxy_handler_t *connman_proxy_handler,
         goto safe_exit;
     }
 
-    net_connman_service_call_disconnect(serv_obj->srv_proxy, NULL, (GAsyncReadyCallback)s_connman_proxy_service_disconnect_cb, serv_obj);
+    connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
+    net_connman_service_call_disconnect(serv_obj->srv_proxy, NULL, (GAsyncReadyCallback)s_connman_proxy_service_disconnect_cb, connman_proxy_handler);
 
 safe_exit:
     return;
@@ -611,7 +666,8 @@ connman_proxy_service_remove(connman_proxy_handler_t *connman_proxy_handler, cha
         goto safe_exit;
     }
 
-    net_connman_service_call_remove(serv_obj->srv_proxy, NULL, (GAsyncReadyCallback)s_connman_proxy_service_remove_cb, serv_obj);
+    connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
+    net_connman_service_call_remove(serv_obj->srv_proxy, NULL, (GAsyncReadyCallback)s_connman_proxy_service_remove_cb, connman_proxy_handler);
 
 safe_exit:
     return;
@@ -635,7 +691,8 @@ connman_proxy_service_set_autoconnect(connman_proxy_handler_t *connman_proxy_han
         CONNMAN_LOG_ERROR("Connect Error : Could not find service %s\n", obj_path);
         return;
     }
-    net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_AUTOCONNECT_STR, g_variant_new("v", g_variant_new_boolean (autoconnect)), NULL, (GAsyncReadyCallback)s_connman_proxy_service_autoconnect_cb, serv_obj);
+    connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
+    net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_AUTOCONNECT_STR, g_variant_new("v", g_variant_new_boolean (autoconnect)), NULL, (GAsyncReadyCallback)s_connman_proxy_service_autoconnect_cb, connman_proxy_handler);
 }
 
 int8_t
@@ -669,7 +726,8 @@ connman_proxy_service_config_ipv4(connman_proxy_handler_t *connman_proxy_handler
                 g_variant_builder_add (ipv4_builder, "{sv}", CONNMAN_PROP_GATEWAY_STR, g_variant_new_string (gw));
         }
         dict = g_variant_builder_end (ipv4_builder);
-        net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_IPV4_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_pv4_config_cb, serv_obj);
+        connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
+        net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_IPV4_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_ipv4_config_cb, connman_proxy_handler);
         g_variant_builder_unref (ipv4_builder);
         ret = CONNMAN_PROXY_SUCCESS;
     }
@@ -697,7 +755,8 @@ connman_proxy_service_config_nameserver(connman_proxy_handler_t *connman_proxy_h
     }
     CONNMAN_BUILD_GVAR_STRING_ARRAY(dns_builder, dns_list);
     dict = g_variant_builder_end(dns_builder);
-    net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_NAMESERV_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_nameserver_config_cb, serv_obj);
+    connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
+    net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_NAMESERV_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_nameserver_config_cb, connman_proxy_handler);
     g_variant_builder_unref (dns_builder);
     ret = CONNMAN_PROXY_SUCCESS;
 safe_exit:
@@ -721,7 +780,8 @@ connman_proxy_service_config_timeserver(connman_proxy_handler_t *connman_proxy_h
     }
     CONNMAN_BUILD_GVAR_STRING_ARRAY(ntps_builder, ntps_list);
     dict = g_variant_builder_end(ntps_builder);
-    net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_TIMESERV_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_timeserver_config_cb, serv_obj);
+    connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
+    net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_TIMESERV_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_timeserver_config_cb, connman_proxy_handler);
     g_variant_builder_unref (ntps_builder);
     ret = CONNMAN_PROXY_SUCCESS;
 safe_exit:
@@ -745,7 +805,8 @@ connman_proxy_service_config_domain(connman_proxy_handler_t *connman_proxy_handl
     }
     CONNMAN_BUILD_GVAR_STRING_ARRAY(domain_builder, domain_list);
     dict = g_variant_builder_end(domain_builder);
-    net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_DOMAINS_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_domain_config_cb, serv_obj);
+    connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
+    net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_DOMAINS_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_domain_config_cb, connman_proxy_handler);
     g_variant_builder_unref (domain_builder);
     ret = CONNMAN_PROXY_SUCCESS;
 safe_exit:
@@ -803,7 +864,8 @@ connman_proxy_service_config_proxy(connman_proxy_handler_t *connman_proxy_handle
             goto safe_exit;
         }
         dict = g_variant_builder_end (proxy_builder);
-        net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_PROXY_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_proxy_config_cb, serv_obj);
+        connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
+        net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_PROXY_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_proxy_config_cb, connman_proxy_handler);
         g_variant_builder_unref (proxy_builder);
         ret = CONNMAN_PROXY_SUCCESS;
     }
@@ -828,7 +890,8 @@ connman_proxy_service_set_mdns(connman_proxy_handler_t *connman_proxy_handler, c
         CONNMAN_LOG_ERROR("Connect Error : Could not find service %s\n", obj_path);
         return;
     }
-    net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_MDNS_STR".Configuration", g_variant_new("v", g_variant_new_boolean (enable)), NULL, (GAsyncReadyCallback)s_connman_proxy_service_mdns_cb, serv_obj);
+    connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
+    net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_MDNS_STR".Configuration", g_variant_new("v", g_variant_new_boolean (enable)), NULL, (GAsyncReadyCallback)s_connman_proxy_service_mdns_cb, connman_proxy_handler);
 }
 
 int8_t

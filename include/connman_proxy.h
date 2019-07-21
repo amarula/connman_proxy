@@ -105,6 +105,90 @@ typedef enum
 }connman_proxy_status_t;
 
 /**
+ * Enum for the notification data types
+ */
+typedef enum
+{
+    CONNMAN_PROXY_NOTIFY_GLOBAL_STATE = 0, /**< 0*/
+    CONNMAN_PROXY_NOTIFY_SERVICE_UPDATE, /**< 1*/
+    CONNMAN_PROXY_NOTIFY_TECH_UPDATE, /**< 2*/
+    CONNMAN_PROXY_NOTIFY_OFFLINE_UPDATE, /**< 3*/
+    CONNMAN_PROXY_NOTIFY_SCAN_COMPLETED, /**< 4*/
+    CONNMAN_PROXY_NOTIFY_CONNMAN_SERVICE_UPDATE, /**< 5*/
+    CONNMAN_PROXY_NOTIFY_ERROR, /**< 6*/
+    CONNMAN_PROXY_NOTIFY_ENDEF  /**< Invalid notification type*/
+}connman_proxy_notify_type_t;
+
+/**
+ * Enum for connman error notifications
+ */
+typedef enum
+{
+    CONNMAN_PROXY_CONFIG_OFFLINE_MODE_ERROR = 0,    /**<  0 Failed to configure offline mode */
+    CONNMAN_PROXY_SCAN_ERROR,                       /**<  1 Failed to scan Wifi network */
+    CONNMAN_PROXY_CONFIG_POWER_ERROR,               /**<  2 Failed to configure power of a tech */
+    CONNMAN_PROXY_SERVICE_CONNECT_ERROR,            /**<  3 Failed to connect to requested service */
+    CONNMAN_PROXY_SERVICE_DISCONNECT_ERROR,         /**<  4 Failed to disconnect to requested service */
+    CONNMAN_PROXY_SERVICE_REMOVE_ERROR,             /**<  5 Failed to remove/forget of a service*/
+    CONNMAN_PROXY_CONFIG_AUTOCONNECT_ERROR,         /**<  6 Failed to configure autoconnect property of a service*/
+    CONNMAN_PROXY_CONFIG_MDNS_ERROR,                /**<  7 Failed to configure mdns property of a service*/
+    CONNMAN_PROXY_CONFIG_IPV4_ERROR,                /**<  8 Failed to configure IPV4 settings of a service*/
+    CONNMAN_PROXY_CONFIG_PROXY_ERROR,               /**<  9 Failed to configure Proxy settings of a service*/
+    CONNMAN_PROXY_CONFIG_DNS_ERROR,                 /**< 10 Failed to configure DNS settings of a service*/
+    CONNMAN_PROXY_CONFIG_NTPS_ERROR,                /**< 11 Failed to configure NTP server for a service*/
+    CONNMAN_PROXY_CONFIG_DOMAIN_ERROR,              /**< 12 Failed to configure Domain settings of a service*/
+}connman_proxy_error_type_t;
+
+/**
+ * Structure to store update notification information for technology
+ */
+typedef struct
+{
+    gchar *type;                /**< Type of this Technlogy interface (ethernet, wifi etc) */
+    gboolean powered;           /**< Whether this Technlogy powered on*/
+    gboolean connected;         /**< Whether this Technlogy connected */
+    gboolean tethered;          /**< Whether this Technlogy tethered. (Tethering is not supported yet)*/
+}connman_proxy_notify_tech_update_data_t;
+
+/**
+ * Structure to store update notification information for service
+ */
+typedef struct
+{
+    char        *name;              /**< SSID for Wifi */
+    char        interface[16];      /**< Interface name, eth0, wln0 etc*/
+    char        type[16];           /**< Type of the network interface ("ethernet", "wifi" etc)*/
+    char        state[16];          /**< Current state of this network interface ("idle", "failure", "association", "configuration", "ready", "disconnect" and "online")*/
+    uint8_t     signal_strength;    /**< Wifi Signal strength. Not applicable for ethernet*/
+}connman_proxy_notify_serv_update_data_t;
+
+/**
+ * Structure to store all notification callback data
+ */
+
+typedef struct
+{
+    connman_proxy_notify_type_t notify_type;
+    union
+    {
+        gboolean service_available; /**< Tells if the network service is available or not*/
+        char  global_state [8];     /**< Data for CONNMAN_PROXY_NOTIFY_GLOBAL_STATE notification which contains network state of the system */
+        char  service_state [8];    /**< Data for CONNMAN_PROXY_NOTIFY_SERVICE_STATE notification which contains network state of the system */
+        gboolean tech_connected;    /**< Data for CONNMAN_PROXY_NOTIFY_TECH_STATE tells if a tehcnology is connected or disconnected */
+        gboolean offline_enabled;   /**< Data for CONNMAN_PROXY_NOTIFY_OFFLINE_MODE tells if the offline mode is enabled or disabled*/
+        connman_proxy_error_type_t error_code;          /**< Data for CONNMAN_PROXY_NOTIFY_ERROR notificationi contains error code.*/
+        connman_proxy_notify_tech_update_data_t tech;   /**< Data for CONNMAN_PROXY_NOTIFY_TECH_UPDATE notification containing tech infomration*/
+        connman_proxy_notify_serv_update_data_t serv;   /**< Data for CONNMAN_PROXY_NOTIFY_SERVICE_UPDATE notification containing service infomration*/
+    }data;
+}connman_proxy_notify_cb_data_t;
+
+/**
+* Typedef for data types and function pointers
+*/
+
+typedef void (*connman_proxy_notify_cb_t)(connman_proxy_notify_cb_data_t *notification_data, gpointer coockie); /**< Callback function to notify the clinet sabout any state update in network with data connman_proxy_notify_cb_data_t*/
+
+/**
  * Structure to store ethrnet information like method, interface name, mac address and MTU
  */
 typedef struct
@@ -232,6 +316,12 @@ typedef struct
     gulong service_changed_sid;                 /**< Signal handler for service_changed signal*/
     gulong tech_added_sid;                      /**< Signal handler for technology_added signal*/
     gulong tech_removed_sid;                    /**< Signal handler for technology_removed signal*/
+
+    /* Notify callback function*/
+    connman_proxy_notify_cb_t   notify_cb;      /**< Callback for notifying any state changes in network as per connman_proxy_notify_type_t*/
+    gpointer                    notify_cookie;  /**< User cookie for connman_proxy_notify_cb_t function*/
+
+    gpointer user_data_1;                       /**< User data to be passed to any connman Async API*/
 }connman_proxy_handler_t;
 
 /* Connman Proxy Main APIs */
@@ -251,9 +341,12 @@ void connman_proxy_deinit(connman_proxy_handler_t *connman_proxy_handler);
  * Add a watcher for service on bus and also register for all the propertyChanged signal of all the interfaces on this service.
  * This will also create a Agent manager interface for wifi activties.
  *
+ * @param  notify_cb A connman_proxy_notify_cb_t callback .
+ * @param  cookie User cookie for connman_proxy_notify_cb_t callback .
+ *
  * @returns Newly created connman proxy handler on success, NULL otherwise.
  */
-connman_proxy_handler_t* connman_proxy_init(void);
+connman_proxy_handler_t* connman_proxy_init(connman_proxy_notify_cb_t notify_cb, gpointer cookie);
 
 #if 0 /* For future */
 int8_t connman_proxy_get_technologies_full(connman_proxy_handler_t *connman_proxy_handler, GSList *technologies);

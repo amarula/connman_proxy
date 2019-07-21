@@ -64,14 +64,14 @@ s_monitor_dbus_signals_cb  (GDBusConnection *connection,
             CONNMAN_LOG_ERROR("Connect Error : Could not find service %s\n", object_path);
             goto safe_exit;
         }
-        connman_proxy_service_property_changed_cb(serv_obj->srv_proxy, string , val, serv_obj);
+        connman_proxy_service_property_changed_cb(serv_obj->srv_proxy, connman_proxy_handler, string , val, serv_obj);
     }
     else if(g_strcmp0(interface_name, CONNMAN_TECHNOLOGY_INTERFACE) == 0)
     {
         connman_proxy_technology_info_t *tech_obj = NULL;
         tech_obj = connman_proxy_technology_find_by_path(connman_proxy_handler, object_path);
         if(tech_obj)
-            connman_proxy_technology_property_changed_cb(tech_obj->tech_proxy, string , val, tech_obj);
+            connman_proxy_technology_property_changed_cb(tech_obj->tech_proxy, connman_proxy_handler, string , val, tech_obj);
         else
         {
             CONNMAN_LOG_ERROR("Connect Error : Could not find technology %s\n", object_path);
@@ -120,6 +120,9 @@ s_on_name_appeared (GDBusConnection *connection,
     connman_proxy_mgr_get_services(connman_proxy_handler);
     connman_proxy_mgr_register_agent(connman_proxy_handler);
 
+    /* Notify Callback*/
+    connman_proxy_util_notify_connman_service_cb(connman_proxy_handler, TRUE);
+
     return;
 }
 
@@ -144,13 +147,16 @@ s_on_name_vanished (GDBusConnection *connection,
         g_signal_handler_disconnect(connman_proxy_handler->manager_proxy, connman_proxy_handler->tech_added_sid);
     if(connman_proxy_handler->service_changed_sid)
         g_signal_handler_disconnect(connman_proxy_handler->manager_proxy, connman_proxy_handler->service_changed_sid);
+
+    /* Notify Callback*/
+    connman_proxy_util_notify_connman_service_cb(connman_proxy_handler, FALSE);
 }
 
 /**** Hidden ****/
 /**** Global ****/
 
 CP_EXPORT connman_proxy_handler_t* 
-connman_proxy_init()
+connman_proxy_init(connman_proxy_notify_cb_t notify_cb, gpointer cookie)
 {
     connman_proxy_handler_t *connman_proxy_handler = NULL;
     GError *err = NULL;
@@ -211,6 +217,8 @@ connman_proxy_init()
     {
         CONNMAN_LOG_WARNING("!!!!!!!!!! Connman Agent manager Initialization Failed !!!!!!!!!! : Wireless Network Interfaces Will not work\n");
     }
+    connman_proxy_handler->notify_cb    = notify_cb;
+    connman_proxy_handler->notify_cookie= cookie;
 
 safe_exit:
     return connman_proxy_handler;
