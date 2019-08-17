@@ -215,8 +215,10 @@ s_connman_proxy_service_connect_cb (GDBusProxy *proxy,
             g_error_free (error);
     }
     if(connman_proxy_handler->user_data_1)
+    {
         g_free(connman_proxy_handler->user_data_1);
-    return;
+        connman_proxy_handler->user_data_1 = NULL;
+    }
 }
 
 static void
@@ -240,8 +242,10 @@ s_connman_proxy_service_disconnect_cb (GDBusProxy *proxy,
             g_error_free (error);
     }
     if(connman_proxy_handler->user_data_1)
+    {
         g_free(connman_proxy_handler->user_data_1);
-    return;
+        connman_proxy_handler->user_data_1 = NULL;
+    }
 }
 
 static void
@@ -265,8 +269,10 @@ s_connman_proxy_service_remove_cb (GDBusProxy *proxy,
             g_error_free (error);
     }
     if(connman_proxy_handler->user_data_1)
+    {
         g_free(connman_proxy_handler->user_data_1);
-    return;
+        connman_proxy_handler->user_data_1 = NULL;
+    }
 }
 
 static void
@@ -290,8 +296,10 @@ s_connman_proxy_service_autoconnect_cb (GDBusProxy *proxy,
             g_error_free (error);
     }
     if(connman_proxy_handler->user_data_1)
+    {
         g_free(connman_proxy_handler->user_data_1);
-    return;
+        connman_proxy_handler->user_data_1 = NULL;
+    }
 }
 
 static void
@@ -315,8 +323,10 @@ s_connman_proxy_service_mdns_cb (GDBusProxy *proxy,
             g_error_free (error);
     }
     if(connman_proxy_handler->user_data_1)
+    {
         g_free(connman_proxy_handler->user_data_1);
-    return;
+        connman_proxy_handler->user_data_1 = NULL;
+    }
 }
 
 static void
@@ -340,8 +350,10 @@ s_connman_proxy_ipv4_config_cb (GDBusProxy *proxy,
             g_error_free (error);
     }
     if(connman_proxy_handler->user_data_1)
+    {
         g_free(connman_proxy_handler->user_data_1);
-    return;
+        connman_proxy_handler->user_data_1 = NULL;
+    }
 }
 
 static void
@@ -360,7 +372,10 @@ s_connman_proxy_proxy_config_cb (GDBusProxy *proxy,
             g_error_free (error);
     }
     if(connman_proxy_handler->user_data_1)
+    {
         g_free(connman_proxy_handler->user_data_1);
+        connman_proxy_handler->user_data_1 = NULL;
+    }
 }
 
 static void
@@ -384,7 +399,10 @@ s_connman_proxy_nameserver_config_cb (GDBusProxy *proxy,
             g_error_free (error);
     }
     if(connman_proxy_handler->user_data_1)
+    {
         g_free(connman_proxy_handler->user_data_1);
+        connman_proxy_handler->user_data_1 = NULL;
+    }
 }
 
 static void
@@ -407,7 +425,10 @@ s_connman_proxy_timeserver_config_cb (GDBusProxy *proxy,
             g_error_free (error);
     }
     if(connman_proxy_handler->user_data_1)
+    {
         g_free(connman_proxy_handler->user_data_1);
+        connman_proxy_handler->user_data_1 = NULL;
+    }
 }
 
 static void
@@ -430,7 +451,10 @@ s_connman_proxy_domain_config_cb (GDBusProxy *proxy,
             g_error_free (error);
     }
     if(connman_proxy_handler->user_data_1)
+    {
         g_free(connman_proxy_handler->user_data_1);
+        connman_proxy_handler->user_data_1 = NULL;
+    }
 }
 
 static void
@@ -624,6 +648,8 @@ connman_proxy_service_connect(connman_proxy_handler_t *connman_proxy_handler, ch
         goto safe_exit;
     }
 
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
     net_connman_service_call_connect(serv_obj->srv_proxy, NULL, (GAsyncReadyCallback)s_connman_proxy_service_connect_cb, connman_proxy_handler);
 
@@ -645,6 +671,8 @@ connman_proxy_service_disconnect(connman_proxy_handler_t *connman_proxy_handler,
         goto safe_exit;
     }
 
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
     net_connman_service_call_disconnect(serv_obj->srv_proxy, NULL, (GAsyncReadyCallback)s_connman_proxy_service_disconnect_cb, connman_proxy_handler);
 
@@ -666,6 +694,8 @@ connman_proxy_service_remove(connman_proxy_handler_t *connman_proxy_handler, cha
         goto safe_exit;
     }
 
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
     net_connman_service_call_remove(serv_obj->srv_proxy, NULL, (GAsyncReadyCallback)s_connman_proxy_service_remove_cb, connman_proxy_handler);
 
@@ -691,6 +721,8 @@ connman_proxy_service_set_autoconnect(connman_proxy_handler_t *connman_proxy_han
         CONNMAN_LOG_ERROR("Connect Error : Could not find service %s\n", obj_path);
         return;
     }
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
     net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_AUTOCONNECT_STR, g_variant_new("v", g_variant_new_boolean (autoconnect)), NULL, (GAsyncReadyCallback)s_connman_proxy_service_autoconnect_cb, connman_proxy_handler);
 }
@@ -726,6 +758,8 @@ connman_proxy_service_config_ipv4(connman_proxy_handler_t *connman_proxy_handler
                 g_variant_builder_add (ipv4_builder, "{sv}", CONNMAN_PROP_GATEWAY_STR, g_variant_new_string (gw));
         }
         dict = g_variant_builder_end (ipv4_builder);
+        if(connman_proxy_handler->user_data_1)
+            g_free(connman_proxy_handler->user_data_1);
         connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
         net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_IPV4_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_ipv4_config_cb, connman_proxy_handler);
         g_variant_builder_unref (ipv4_builder);
@@ -755,6 +789,8 @@ connman_proxy_service_config_nameserver(connman_proxy_handler_t *connman_proxy_h
     }
     CONNMAN_BUILD_GVAR_STRING_ARRAY(dns_builder, dns_list);
     dict = g_variant_builder_end(dns_builder);
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
     net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_NAMESERV_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_nameserver_config_cb, connman_proxy_handler);
     g_variant_builder_unref (dns_builder);
@@ -780,6 +816,8 @@ connman_proxy_service_config_timeserver(connman_proxy_handler_t *connman_proxy_h
     }
     CONNMAN_BUILD_GVAR_STRING_ARRAY(ntps_builder, ntps_list);
     dict = g_variant_builder_end(ntps_builder);
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
     net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_TIMESERV_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_timeserver_config_cb, connman_proxy_handler);
     g_variant_builder_unref (ntps_builder);
@@ -805,6 +843,8 @@ connman_proxy_service_config_domain(connman_proxy_handler_t *connman_proxy_handl
     }
     CONNMAN_BUILD_GVAR_STRING_ARRAY(domain_builder, domain_list);
     dict = g_variant_builder_end(domain_builder);
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
     net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_DOMAINS_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_domain_config_cb, connman_proxy_handler);
     g_variant_builder_unref (domain_builder);
@@ -864,6 +904,8 @@ connman_proxy_service_config_proxy(connman_proxy_handler_t *connman_proxy_handle
             goto safe_exit;
         }
         dict = g_variant_builder_end (proxy_builder);
+        if(connman_proxy_handler->user_data_1)
+            g_free(connman_proxy_handler->user_data_1);
         connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
         net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_PROXY_STR".Configuration", g_variant_new("v", dict), NULL, (GAsyncReadyCallback)s_connman_proxy_proxy_config_cb, connman_proxy_handler);
         g_variant_builder_unref (proxy_builder);
@@ -890,6 +932,8 @@ connman_proxy_service_set_mdns(connman_proxy_handler_t *connman_proxy_handler, c
         CONNMAN_LOG_ERROR("Connect Error : Could not find service %s\n", obj_path);
         return;
     }
+    if(connman_proxy_handler->user_data_1)
+        g_free(connman_proxy_handler->user_data_1);
     connman_proxy_handler->user_data_1 = g_strdup(serv_obj->name);
     net_connman_service_call_set_property(serv_obj->srv_proxy, CONNMAN_PROP_MDNS_STR".Configuration", g_variant_new("v", g_variant_new_boolean (enable)), NULL, (GAsyncReadyCallback)s_connman_proxy_service_mdns_cb, connman_proxy_handler);
 }
