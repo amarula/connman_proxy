@@ -138,17 +138,29 @@ s_on_name_vanished (GDBusConnection *connection,
 
     /* Unsubscripe all property changed notifications first */
     if(connman_proxy_handler->subscription_id)
+    {
         g_dbus_connection_signal_unsubscribe (connman_proxy_handler->connection, connman_proxy_handler->subscription_id);
+        connman_proxy_handler->subscription_id = 0;
+    }
 
     /* Remove signal handlers*/
     if(connman_proxy_handler->tech_removed_sid)
+    {
         g_signal_handler_disconnect(connman_proxy_handler->manager_proxy, connman_proxy_handler->tech_removed_sid);
+        connman_proxy_handler->tech_removed_sid = 0;
+    }
     if(connman_proxy_handler->tech_added_sid)
+    {
         g_signal_handler_disconnect(connman_proxy_handler->manager_proxy, connman_proxy_handler->tech_added_sid);
+        connman_proxy_handler->tech_added_sid = 0;
+    }
     if(connman_proxy_handler->service_changed_sid)
+    {
         g_signal_handler_disconnect(connman_proxy_handler->manager_proxy, connman_proxy_handler->service_changed_sid);
+        connman_proxy_handler->service_changed_sid = 0;
+    }
 
-    /* Notify Callback*/
+    /* Notify Callback with service availability status*/
     connman_proxy_util_notify_connman_service_cb(connman_proxy_handler, FALSE);
 }
 
@@ -219,6 +231,9 @@ connman_proxy_init(connman_proxy_notify_cb_t notify_cb, gpointer cookie)
     }
     connman_proxy_handler->notify_cb    = notify_cb;
     connman_proxy_handler->notify_cookie= cookie;
+
+    /* Set default state as offline*/
+    strcpy(connman_proxy_handler->global_state, "Offline");
 
 safe_exit:
     return connman_proxy_handler;

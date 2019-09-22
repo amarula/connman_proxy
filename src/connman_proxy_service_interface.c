@@ -41,6 +41,8 @@
         }\
         else if(strcmp(key, CONNMAN_PROP_STATE_STR) == 0) \
             CONNMAN_VAR_GET_STR_COPY(value, &service_obj->state[0]) \
+        else if(strcmp(key, CONNMAN_PROP_ERROR_STR) == 0) \
+            CONNMAN_VAR_GET_STR_COPY(value, &service_obj->error[0]) \
         else if(strcmp(key, CONNMAN_PROP_FAVORITE_STR) == 0) \
             CONNMAN_VAR_GET_BOOL(value, service_obj->favorite) \
         else if(strcmp(key, CONNMAN_PROP_IMMUTABLE_STR) == 0) \

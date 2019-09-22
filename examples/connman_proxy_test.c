@@ -146,10 +146,15 @@ s_connman_proxy_get_services(connman_proxy_handler_t *connman_proxy_handler)
     gpointer key, value;
     connman_proxy_service_info_t *service = NULL;
     
+    if(connman_proxy_handler == NULL)
+    {
+        CONNMAN_LOG_ERROR("Invalid Connman Poxy Handler\n");
+        goto safe_exit;
+    }
     if(connman_proxy_handler->services == NULL || g_hash_table_size(connman_proxy_handler->services) == 0)
     {
         CONNMAN_LOG_WARNING("No services available !!!\n");
-        return;
+        goto safe_exit;
     }
 
     g_hash_table_iter_init (&iter, connman_proxy_handler->services);
@@ -162,6 +167,8 @@ s_connman_proxy_get_services(connman_proxy_handler_t *connman_proxy_handler)
                           "\t\tType         : %s\n",
                     (gchar *)key, service->name ? service->name : "**Hidden**", service->service_name, service->type);
     }
+safe_exit:
+    return;
 }
 
 static void
@@ -174,6 +181,11 @@ s_connman_proxy_get_technologies(connman_proxy_handler_t *connman_proxy_handler)
 	if(connman_proxy_handler == NULL)
     {
         CONNMAN_LOG_ERROR("Invalid Connman Poxy Handler\n");
+        goto safe_exit;
+    }
+    if(connman_proxy_handler->technologies == NULL || g_slist_length(connman_proxy_handler->technologies) == 0)
+    {
+        CONNMAN_LOG_WARNING("No Technology available !!!\n");
         goto safe_exit;
     }
 
@@ -253,7 +265,7 @@ s_select_service_from_list(connman_proxy_handler_t *connman_proxy_handler)
 
     GHashTableIter iter;
     gpointer key, value;
-    connman_proxy_service_info_t **tmp_srv_list =  malloc(g_hash_table_size(connman_proxy_handler->services) * sizeof(connman_proxy_service_info_t*));
+    connman_proxy_service_info_t **tmp_srv_list = NULL;
     connman_proxy_service_info_t *ret_srv = NULL;
 
     if(connman_proxy_handler->services == NULL)
@@ -261,6 +273,7 @@ s_select_service_from_list(connman_proxy_handler_t *connman_proxy_handler)
         CONNMAN_LOG_WARNING("No services available yet!!!\n");
         return ret_srv;
     }
+    tmp_srv_list =  malloc(g_hash_table_size(connman_proxy_handler->services) * sizeof(connman_proxy_service_info_t*));
 
     CONNMAN_LOG_USER("\nSelect A Service From Below\n");
     g_hash_table_iter_init (&iter, connman_proxy_handler->services);
