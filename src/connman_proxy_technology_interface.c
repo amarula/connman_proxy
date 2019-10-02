@@ -72,14 +72,14 @@ s_connman_proxy_tech_scan_cb (GDBusProxy *proxy,
 
     if(ret == TRUE)
     {
-        connman_proxy_notify_cb_data_t *notify_data = NULL;
+        connman_proxy_update_cb_data_t *notify_data = NULL;
         CONNMAN_LOG_INFO("Scan Completed...\n");
-        if(connman_proxy_handler->notify_cb)
-            notify_data = (connman_proxy_notify_cb_data_t*) malloc(sizeof(connman_proxy_notify_cb_data_t));
+        if(connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
+            notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
         if(notify_data)
         {
             notify_data->notify_type = CONNMAN_PROXY_NOTIFY_SCAN_COMPLETED;
-            connman_proxy_handler->notify_cb(notify_data, connman_proxy_handler->notify_cookie);
+            connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
         }
     }
     else
@@ -168,9 +168,9 @@ connman_proxy_technology_property_changed_cb(NetConnmanTechnology *object, connm
     CONNMAN_PROXY_TECH_PARSE_PROPERTY(tech_obj, name, unboxed_value);
 
     /* Notify Callback */
-    if(connman_proxy_handler->notify_cb)
+    if(connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
     {
-        connman_proxy_notify_cb_data_t *notify_data = (connman_proxy_notify_cb_data_t*) malloc(sizeof(connman_proxy_notify_cb_data_t));
+        connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
         if(NULL == notify_data)
             return;
 
@@ -180,7 +180,7 @@ connman_proxy_technology_property_changed_cb(NetConnmanTechnology *object, connm
         notify_data->data.tech.connected = tech_obj->connected;
         /* TODO tethering not suported yet*/
 
-        connman_proxy_handler->notify_cb(notify_data, connman_proxy_handler->notify_cookie);
+        connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
     }
 }
 

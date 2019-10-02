@@ -179,7 +179,6 @@ typedef struct
 /**
  * Structure to store all notification callback data
  */
-
 typedef struct
 {
     connman_proxy_notify_type_t notify_type;
@@ -190,17 +189,18 @@ typedef struct
         char  service_state [8];    /**< Data for CONNMAN_PROXY_NOTIFY_SERVICE_STATE notification which contains network state of the system */
         gboolean tech_connected;    /**< Data for CONNMAN_PROXY_NOTIFY_TECH_STATE tells if a tehcnology is connected or disconnected */
         gboolean offline_enabled;   /**< Data for CONNMAN_PROXY_NOTIFY_OFFLINE_MODE tells if the offline mode is enabled or disabled*/
-        connman_proxy_error_type_t error_code;          /**< Data for CONNMAN_PROXY_NOTIFY_ERROR notificationi contains error code.*/
+        connman_proxy_error_type_t error_code;          /**< Data for CONNMAN_PROXY_NOTIFY_ERROR notification contains error code.*/
         connman_proxy_notify_tech_update_data_t tech;   /**< Data for CONNMAN_PROXY_NOTIFY_TECH_UPDATE notification containing tech infomration*/
         connman_proxy_notify_serv_update_data_t serv;   /**< Data for CONNMAN_PROXY_NOTIFY_SERVICE_UPDATE notification containing service infomration*/
     }data;
-}connman_proxy_notify_cb_data_t;
+}connman_proxy_update_cb_data_t;
 
 /**
 * Typedef for data types and function pointers
 */
 
-typedef void (*connman_proxy_notify_cb_t)(connman_proxy_notify_cb_data_t *notification_data, gpointer coockie); /**< Callback function to notify the clinet sabout any state update in network with data connman_proxy_notify_cb_data_t*/
+typedef gboolean (*connman_proxy_on_update_cb_t)(connman_proxy_update_cb_data_t *update_data, gpointer cookie); /**< Callback function to notify the clinet about network updates with data connman_proxy_update_cb_data_t*/
+typedef gboolean (*connman_proxy_on_input_req_cb_t)(connman_mgr_request_input_type_t input_type); /**< Callback function to notify the clinet when there is a input of type connman_mgr_request_input_type_t required */
 
 /**
  * Structure to store ethrnet information like method, interface name, mac address and MTU
@@ -289,6 +289,14 @@ typedef struct
     gboolean tethering;                 /**< Whether this Technlogy tethered. (Tethering is not supported yet)*/
 }connman_proxy_technology_info_t;
 
+/* Callback functions */
+typedef struct
+{
+    connman_proxy_on_update_cb_t    on_update;      /**< Callback for notifying any state changes in network as per connman_proxy_notify_type_t*/
+    connman_proxy_on_input_req_cb_t on_input_req;   /**< Callback for notifying any state changes in network as per connman_proxy_notify_type_t*/
+    gpointer                        cookie;         /**< User cookie for theses callback functions*/
+}connman_proxy_callback_handlers_t;
+
 /**
  * Connman Proxy object handler
  */
@@ -331,9 +339,7 @@ typedef struct
     gulong tech_added_sid;                      /**< Signal handler for technology_added signal*/
     gulong tech_removed_sid;                    /**< Signal handler for technology_removed signal*/
 
-    /* Notify callback function*/
-    connman_proxy_notify_cb_t   notify_cb;      /**< Callback for notifying any state changes in network as per connman_proxy_notify_type_t*/
-    gpointer                    notify_cookie;  /**< User cookie for connman_proxy_notify_cb_t function*/
+    connman_proxy_callback_handlers_t *cb;       /**< Callback handlers for handling state change and input request */
 
     gpointer user_data_1;                       /**< User data to be passed to any connman Async API*/
 }connman_proxy_handler_t;
@@ -355,12 +361,12 @@ void connman_proxy_deinit(connman_proxy_handler_t *connman_proxy_handler);
  * Add a watcher for service on bus and also register for all the propertyChanged signal of all the interfaces on this service.
  * This will also create a Agent manager interface for wifi activties.
  *
- * @param  notify_cb A connman_proxy_notify_cb_t callback .
- * @param  cookie User cookie for connman_proxy_notify_cb_t callback .
+ * @param  cb Contains callback handlers, Refer connman_proxy_callback_handlers_t .
+ * @param  cookie User cookie for connman_proxy_on_update_cb_t callback .
  *
  * @returns Newly created connman proxy handler on success, NULL otherwise.
  */
-connman_proxy_handler_t* connman_proxy_init(connman_proxy_notify_cb_t notify_cb, gpointer cookie);
+connman_proxy_handler_t* connman_proxy_init(connman_proxy_callback_handlers_t *cb, gpointer cookie);
 
 #if 0 /* For future */
 int8_t connman_proxy_get_technologies_full(connman_proxy_handler_t *connman_proxy_handler, GSList *technologies);

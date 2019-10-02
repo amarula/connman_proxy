@@ -63,7 +63,8 @@ static void s_connman_proxy_get_services(connman_proxy_handler_t *connman_proxy_
 static int32_t s_connman_get_single_key(void);
 void* connman_on_key_pressed(void *user_data);
 
-void connman_proxy_test_cb(connman_proxy_notify_cb_data_t *notification_data, gpointer cookie);
+gboolean connman_proxy_test_update_cb(connman_proxy_update_cb_data_t *notification_data, gpointer cookie);
+gboolean connman_proxy_test_input_cb(connman_mgr_request_input_type_t input_type);
 
 /****** Test Inputs (NULL terminated)********/
 char *tmp_ip4[][5] = {
@@ -89,6 +90,13 @@ char *tmp_ntps[][4] =  {
 							{"in.pool.ntp.org", "asia.pool.ntp.org", "asia.pool.ntp.org", NULL},
 							{"asia.pool.ntp.org", "in.pool.ntp.org", "asia.pool.ntp.org", NULL}
 						};
+
+connman_proxy_callback_handlers_t g_cb_handlers =
+{
+    connman_proxy_test_update_cb,   /*on_update_cb*/
+    connman_proxy_test_input_cb,    /*on_input_request*/
+    NULL                            /*Cookie*/
+};
 
 static void
 s_print_usage()
@@ -293,10 +301,19 @@ s_select_service_from_list(connman_proxy_handler_t *connman_proxy_handler)
     return ret_srv;
 }
 
-void connman_proxy_test_cb(connman_proxy_notify_cb_data_t *notification_data, gpointer cookie)
+gboolean connman_proxy_test_input_cb(connman_mgr_request_input_type_t input_type)
 {
+
+    gboolean ret = TRUE;
+
+    return ret;
+}
+
+gboolean connman_proxy_test_update_cb(connman_proxy_update_cb_data_t *notification_data, gpointer cookie)
+{
+    gboolean ret = TRUE;
     if(NULL == notification_data)
-        return;
+        return FALSE;
     switch(notification_data->notify_type)
     {
         case CONNMAN_PROXY_NOTIFY_CONNMAN_SERVICE_UPDATE:
@@ -330,9 +347,11 @@ void connman_proxy_test_cb(connman_proxy_notify_cb_data_t *notification_data, gp
             break;
         default:
             CONNMAN_LOG_WARNING("!!!!!!!!!! Noification %d Not Handled !!!!!!!!!!\n", notification_data->notify_type);
+            ret = FALSE;
             break;
     }
     free(notification_data);
+    return ret;
 }
 
 void * connman_on_key_pressed(void *user_data)
@@ -505,7 +524,7 @@ int main(int argc,char *argv[])
 {
     connman_proxy_handler_t *connman_proxy_handler = NULL;
 
-    connman_proxy_handler = connman_proxy_init(connman_proxy_test_cb, NULL);
+    connman_proxy_handler = connman_proxy_init(&g_cb_handlers, NULL);
     if(connman_proxy_handler == NULL)
     {
         CONNMAN_LOG_ERROR("xxxxxxxxxx Connman Proxy Init failed xxxxxxxxxx\n");

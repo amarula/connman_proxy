@@ -168,7 +168,7 @@ s_on_name_vanished (GDBusConnection *connection,
 /**** Global ****/
 
 CP_EXPORT connman_proxy_handler_t* 
-connman_proxy_init(connman_proxy_notify_cb_t notify_cb, gpointer cookie)
+connman_proxy_init(connman_proxy_callback_handlers_t *cb, gpointer cookie)
 {
     connman_proxy_handler_t *connman_proxy_handler = NULL;
     GError *err = NULL;
@@ -229,8 +229,7 @@ connman_proxy_init(connman_proxy_notify_cb_t notify_cb, gpointer cookie)
     {
         CONNMAN_LOG_WARNING("!!!!!!!!!! Connman Agent manager Initialization Failed !!!!!!!!!! : Wireless Network Interfaces Will not work\n");
     }
-    connman_proxy_handler->notify_cb    = notify_cb;
-    connman_proxy_handler->notify_cookie= cookie;
+    connman_proxy_handler->cb = cb;
 
     /* Set default state as offline*/
     strcpy(connman_proxy_handler->global_state, "Offline");

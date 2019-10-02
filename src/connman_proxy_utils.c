@@ -42,15 +42,15 @@ connman_proxy_util_notify_error_cb(connman_proxy_handler_t *connman_proxy_handle
 {
     connman_return_if_invalid_arg(NULL == connman_proxy_handler);
 
-    if(connman_proxy_handler->notify_cb)
+    if(connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
     {
-        connman_proxy_notify_cb_data_t *notify_data = (connman_proxy_notify_cb_data_t*) malloc(sizeof(connman_proxy_notify_cb_data_t));
+        connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
         if(NULL == notify_data)
             return;
 
         notify_data->notify_type = CONNMAN_PROXY_NOTIFY_ERROR;
         notify_data->data.error_code = error_code;
-        connman_proxy_handler->notify_cb(notify_data, connman_proxy_handler->notify_cookie);
+        connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
     }
 }
 
@@ -59,15 +59,15 @@ connman_proxy_util_notify_connman_service_cb(connman_proxy_handler_t *connman_pr
 {
     connman_return_if_invalid_arg(NULL == connman_proxy_handler);
 
-    if(connman_proxy_handler->notify_cb)
+    if(connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
     {
-        connman_proxy_notify_cb_data_t *notify_data = (connman_proxy_notify_cb_data_t*) malloc(sizeof(connman_proxy_notify_cb_data_t));
+        connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
         if(NULL == notify_data)
             return;
 
         notify_data->notify_type = CONNMAN_PROXY_NOTIFY_CONNMAN_SERVICE_UPDATE;
         notify_data->data.service_available = available;
-        connman_proxy_handler->notify_cb(notify_data, connman_proxy_handler->notify_cookie);
+        connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
     }
 }
 

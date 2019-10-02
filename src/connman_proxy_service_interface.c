@@ -534,9 +534,9 @@ connman_proxy_service_property_changed_cb(NetConnmanService *object, connman_pro
     connman_proxy_util_print_g_variant(name, unboxed_value);
 
     /* Notify Callback */
-    if(connman_proxy_handler->notify_cb)
+    if(connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
     {
-        connman_proxy_notify_cb_data_t *notify_data = (connman_proxy_notify_cb_data_t*) malloc(sizeof(connman_proxy_notify_cb_data_t));
+        connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
         if(NULL == notify_data)
             return;
 
@@ -548,7 +548,7 @@ connman_proxy_service_property_changed_cb(NetConnmanService *object, connman_pro
         strncpy(notify_data->data.serv.state, service_obj->state, sizeof(notify_data->data.serv.state));
         notify_data->data.serv.signal_strength = service_obj->signal_strength;
 
-        connman_proxy_handler->notify_cb(notify_data, connman_proxy_handler->notify_cookie);
+        connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
     }
 }
 

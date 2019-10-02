@@ -222,9 +222,9 @@ connman_proxy_mgr_property_changed_cb(NetConnmanManager *object, char *name, GVa
     CONNMAN_PROXY_MGR_PARSE_SYSTEM_PROPERTY(connman_proxy_handler, name, unboxed_value);
 
     /* Notify Callback */
-    if(connman_proxy_handler->notify_cb)
+    if(connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
     {
-        connman_proxy_notify_cb_data_t *notify_data = (connman_proxy_notify_cb_data_t*) malloc(sizeof(connman_proxy_notify_cb_data_t));
+        connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
         if(NULL == notify_data)
             return;
 
@@ -238,7 +238,7 @@ connman_proxy_mgr_property_changed_cb(NetConnmanManager *object, char *name, GVa
             notify_data->notify_type = CONNMAN_PROXY_NOTIFY_GLOBAL_STATE;
             strncpy(notify_data->data.global_state, connman_proxy_handler->global_state, sizeof(notify_data->data.global_state));
         }
-        connman_proxy_handler->notify_cb(notify_data, connman_proxy_handler->notify_cookie);
+        connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
     }
 }
 
