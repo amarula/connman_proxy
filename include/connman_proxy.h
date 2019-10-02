@@ -137,7 +137,21 @@ typedef enum
     CONNMAN_PROXY_CONFIG_DNS_ERROR,                 /**< 10 Failed to configure DNS settings of a service*/
     CONNMAN_PROXY_CONFIG_NTPS_ERROR,                /**< 11 Failed to configure NTP server for a service*/
     CONNMAN_PROXY_CONFIG_DOMAIN_ERROR,              /**< 12 Failed to configure Domain settings of a service*/
+    CONNMAN_PROXY_INVALID_KEY_ERROR,                /**< 13 Invalid Wifi Key Entered*/
+    CONNMAN_PROXY_UNKNOWN_ERROR,                    /**< 14 Unknown Error */
 }connman_proxy_error_type_t;
+
+/*Connman manager Enum*/
+typedef enum
+{
+    CONNMAN_MGR_INPUT_TYPE_SSID = 0,
+    CONNMAN_MGR_INPUT_TYPE_IDENTITY,
+    CONNMAN_MGR_INPUT_TYPE_PASSPHRASE,
+    CONNMAN_MGR_INPUT_TYPE_WPS,
+    CONNMAN_MGR_INPUT_TYPE_WISPR_USERNAME,
+    CONNMAN_MGR_INPUT_TYPE_WISPR_PASSPHRASE,
+    CONNMAN_MGR_INPUT_TYPE_ENDDEF
+}connman_mgr_request_input_type_t;
 
 /**
  * Structure to store update notification information for technology

@@ -71,11 +71,16 @@ s_connman_mgr_on_handle_request_browser_cb (NetConnmanAgent *object, GDBusMethod
 static gboolean
 s_connman_mgr_on_handle_report_error_cb (NetConnmanAgent *object, GDBusMethodInvocation *invocation, const gchar *service_obj_path, gchar *error, gpointer user_data)
 {
-    CONNMAN_LOG_WARNING("!!!!!!!!!! Report Error Not Implemented !!!!!!!!!! : Service %s , Error : %s\n", service_obj_path ? service_obj_path :" Unknown Service", error);
+    connman_proxy_handler_t *connman_proxy_handler = (connman_proxy_handler_t *)user_data;
+    CONNMAN_LOG_WARNING("!!!!!!!!!! Report Error Partially Implemented !!!!!!!!!! : Service %s , Error : %s\n", service_obj_path ? service_obj_path :" Unknown Service", error);
     CONNMAN_PROXY_UNUSED(object);
     CONNMAN_PROXY_UNUSED(invocation);
     CONNMAN_PROXY_UNUSED(user_data);
-    return TRUE;
+    if(0 == strcmp(error, "invalid-key"))
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_INVALID_KEY_ERROR);
+    else
+        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_UNKNOWN_ERROR);
+    return FALSE;
 }
 
 static gboolean
