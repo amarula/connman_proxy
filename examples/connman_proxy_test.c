@@ -303,9 +303,40 @@ s_select_service_from_list(connman_proxy_handler_t *connman_proxy_handler)
 
 gboolean connman_proxy_test_input_cb(connman_mgr_request_input_type_t input_type)
 {
+    char identity[CONNMAN_MGR_AGENT_MAX_INPUT_LENGTH], passphrase[CONNMAN_MGR_AGENT_MAX_INPUT_LENGTH];
+    GVariantBuilder * input_builder = NULL;
+    GVariant *_value = NULL, *res = NULL;
 
     gboolean ret = TRUE;
 
+    switch(input_type)
+    {
+        case CONNMAN_MGR_INPUT_TYPE_PASSPHRASE:
+        {
+            CONNMAN_LOG_USER("%s: Enter Password [Enter cancel to cancel the request]: ", " WiFi Service");
+            fflush(stdout);
+            scanf("%s", passphrase);
+
+            if(0 == strcmp(passphrase, "cancel")) /* For testing cancel API*/
+                connman_mgr_cancel_user_input(input_type);
+            else
+            {
+                input_builder = g_variant_builder_new(G_VARIANT_TYPE("a{sv}"));
+                _value = g_variant_new("s", passphrase);
+                g_variant_builder_add (input_builder, "{sv}", "Passphrase", _value);
+                res = g_variant_new("a{sv}", input_builder);
+                if(FALSE == connman_mgr_set_user_input(input_type, res))
+                    g_variant_unref (res);
+                g_variant_builder_unref (input_builder);
+            }
+            break;
+        }
+        default:
+            CONNMAN_LOG_WARNING("!!!!!!!!!! Input Type %d Not Handled !!!!!!!!!!\n", input_type);
+            CONNMAN_PROXY_UNUSED(identity);
+            ret = FALSE;
+            break;
+    }
     return ret;
 }
 

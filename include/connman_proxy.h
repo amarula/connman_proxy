@@ -534,4 +534,7 @@ void connman_proxy_util_print_g_variant(char *key, GVariant *val);
  */
 void connman_proxy_util_print_services(connman_proxy_service_info_t *service);
 
+/* Manager APIs */
+#include <connman_mgr_agent.h>
+
 #endif /* __CONNMAN_PROXY_H */
