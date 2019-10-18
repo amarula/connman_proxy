@@ -1,8 +1,8 @@
 project('connman_proxy', 'c',
         version : '1.0.0',
-        license: 'LGPL2+'
+        license: 'LGPL2+',
+        meson_version: '>=0.46'
     )
-
 compiler = meson.get_compiler('c')
 
 ###############
