@@ -199,8 +199,24 @@ typedef struct
 * Typedef for data types and function pointers
 */
 
-typedef gboolean (*connman_proxy_on_update_cb_t)(connman_proxy_update_cb_data_t *update_data, gpointer cookie); /**< Callback function to notify the clinet about network updates with data connman_proxy_update_cb_data_t*/
-typedef gboolean (*connman_proxy_on_input_req_cb_t)(connman_mgr_request_input_type_t input_type); /**< Callback function to notify the clinet when there is a input of type connman_mgr_request_input_type_t required */
+/**
+ * Callback function to notify the clinet about network updates with data connman_proxy_update_cb_data_t
+ *
+ * @param update_data(transfer full) Notification data connman_proxy_update_cb_data_t
+ * @param cookie User cookie
+ *
+ * returns TRUE if the callback is handled, otherwise FALSE
+ */
+typedef gboolean (*connman_proxy_on_update_cb_t)(connman_proxy_update_cb_data_t *update_data, gpointer cookie);
+
+/**
+ * Callback function to notify the clinet when there is a input of type connman_mgr_request_input_type_t required
+ *
+ * @param input_type Type of input request, connman_mgr_request_input_type_t
+ *
+ * returns TRUE if the callback is handled, otherwise FALSE
+ */
+typedef gboolean (*connman_proxy_on_input_req_cb_t)(connman_mgr_request_input_type_t input_type, gpointer cookie);
 
 /**
  * Structure to store ethrnet information like method, interface name, mac address and MTU

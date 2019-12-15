@@ -64,7 +64,7 @@ static int32_t s_connman_get_single_key(void);
 void* connman_on_key_pressed(void *user_data);
 
 gboolean connman_proxy_test_update_cb(connman_proxy_update_cb_data_t *notification_data, gpointer cookie);
-gboolean connman_proxy_test_input_cb(connman_mgr_request_input_type_t input_type);
+gboolean connman_proxy_test_input_cb(connman_mgr_request_input_type_t input_type, gpointer cookie);
 
 /****** Test Inputs (NULL terminated)********/
 char *tmp_ip4[][5] = {
@@ -301,7 +301,7 @@ s_select_service_from_list(connman_proxy_handler_t *connman_proxy_handler)
     return ret_srv;
 }
 
-gboolean connman_proxy_test_input_cb(connman_mgr_request_input_type_t input_type)
+gboolean connman_proxy_test_input_cb(connman_mgr_request_input_type_t input_type, gpointer cookie)
 {
     char identity[CONNMAN_MGR_AGENT_MAX_INPUT_LENGTH], passphrase[CONNMAN_MGR_AGENT_MAX_INPUT_LENGTH];
     GVariantBuilder * input_builder = NULL;
@@ -367,11 +367,17 @@ gboolean connman_proxy_test_update_cb(connman_proxy_update_cb_data_t *notificati
                 g_free(notification_data->data.serv.name);
             break;
         case CONNMAN_PROXY_NOTIFY_TECH_UPDATE:
-            CONNMAN_LOG_INFO("[%s] Updated : \[%spowered ] [ %sconnected ]\n",
-                            notification_data->data.tech.type ? notification_data->data.tech.type : "Unknown",
-                            notification_data->data.tech.powered ? " ": " Not ", notification_data->data.tech.connected ? " ": " Not ");
             if(notification_data->data.tech.type)
+            {
+                CONNMAN_LOG_INFO("[%s] Added/Updated : \[%spowered ] [ %sconnected ]\n",
+                            notification_data->data.tech.type,
+                            notification_data->data.tech.powered ? " ": " Not ", notification_data->data.tech.connected ? " ": " Not ");
                 g_free(notification_data->data.tech.type );
+            }
+            else
+            {
+                CONNMAN_LOG_INFO("Technology has been removed\n");
+            }
             break;
         case CONNMAN_PROXY_NOTIFY_SCAN_COMPLETED:
             CONNMAN_LOG_INFO("WiFi Scan Completed\n");

@@ -41,14 +41,13 @@ typedef struct
 {
     connman_mgr_request_input_type_t input_type;
     connman_proxy_on_input_req_cb_t cb;
+    gpointer cookie;
     NetConnmanAgent *object;
     GDBusMethodInvocation *invocation;
     guint timeout_id;
 }connman_mgr_agent_pending_req_pvt_t;
 
 /**** Static ****/
-static gpointer s_connman_mgr_request_user_input(gpointer user_data);
-
 static void
 s_connman_mgr_parse_request_input(GVariant *properties, connman_mgr_request_input_type_t *input_type)
 {
@@ -124,15 +123,6 @@ s_connman_on_agent_request_timeout (gpointer user_data)
     return FALSE;
 }
 
-static gpointer
-s_connman_mgr_request_user_input(gpointer user_data)
-{
-    connman_mgr_agent_pending_req_pvt_t *agent_req = (connman_mgr_agent_pending_req_pvt_t *)user_data;
-    agent_req->cb(agent_req->input_type);
-    g_thread_unref (g_thread_self ()); /* Self detach to avoid using join*/
-    return NULL;
-}
-
 static gboolean
 s_connman_mgr_on_handle_request_input_cb (NetConnmanAgent *object, GDBusMethodInvocation *invocation, const gchar *service_obj_path, GVariant *fields, gpointer user_data)
 {
@@ -158,6 +148,7 @@ s_connman_mgr_on_handle_request_input_cb (NetConnmanAgent *object, GDBusMethodIn
             goto safe_exit;
         }
         agent_req->cb = connman_proxy_handler->cb->on_input_req;
+        agent_req->cookie = connman_proxy_handler->cb->cookie;
         agent_req->input_type = input_type;
         agent_req->object = object;
         agent_req->invocation = invocation;
@@ -165,8 +156,7 @@ s_connman_mgr_on_handle_request_input_cb (NetConnmanAgent *object, GDBusMethodIn
         g_hash_table_replace(s_pending_req_table, GINT_TO_POINTER(input_type), agent_req);
         g_mutex_unlock(&s_req_table_mutex);
 
-        /* No need to store and join the return GThread id, It will be dettached using g_thread_unref() before returning from thread*/
-        g_thread_new("Input Request Thread", &s_connman_mgr_request_user_input, (gpointer)(agent_req));
+        agent_req->cb(input_type, agent_req->cookie); /* Blocked untill returned */
     }
     else
     {
