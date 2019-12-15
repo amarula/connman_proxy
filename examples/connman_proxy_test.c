@@ -555,7 +555,7 @@ int main(int argc,char *argv[])
 {
     connman_proxy_handler_t *connman_proxy_handler = NULL;
 
-    connman_proxy_handler = connman_proxy_init(&g_cb_handlers, NULL);
+    connman_proxy_handler = connman_proxy_init(&g_cb_handlers);
     if(connman_proxy_handler == NULL)
     {
         CONNMAN_LOG_ERROR("xxxxxxxxxx Connman Proxy Init failed xxxxxxxxxx\n");

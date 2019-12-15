@@ -362,11 +362,10 @@ void connman_proxy_deinit(connman_proxy_handler_t *connman_proxy_handler);
  * This will also create a Agent manager interface for wifi activties.
  *
  * @param  cb Contains callback handlers, Refer connman_proxy_callback_handlers_t .
- * @param  cookie User cookie for connman_proxy_on_update_cb_t callback .
  *
  * @returns Newly created connman proxy handler on success, NULL otherwise.
  */
-connman_proxy_handler_t* connman_proxy_init(connman_proxy_callback_handlers_t *cb, gpointer cookie);
+connman_proxy_handler_t* connman_proxy_init(connman_proxy_callback_handlers_t *cb);
 
 #if 0 /* For future */
 int8_t connman_proxy_get_technologies_full(connman_proxy_handler_t *connman_proxy_handler, GSList *technologies);

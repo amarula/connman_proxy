@@ -168,7 +168,7 @@ s_on_name_vanished (GDBusConnection *connection,
 /**** Global ****/
 
 CP_EXPORT connman_proxy_handler_t* 
-connman_proxy_init(connman_proxy_callback_handlers_t *cb, gpointer cookie)
+connman_proxy_init(connman_proxy_callback_handlers_t *cb)
 {
     connman_proxy_handler_t *connman_proxy_handler = NULL;
     GError *err = NULL;

@@ -300,7 +300,7 @@ connman_proxy_mgr_get_services(connman_proxy_handler_t *connman_proxy_handler)
     GError *err = NULL;
 
     connman_return_val_if_invalid_arg(connman_proxy_handler == NULL, -1);
- 
+
     net_connman_manager_call_get_services_sync(connman_proxy_handler->manager_proxy, &res, NULL, &err);
     if(err)
     {
@@ -338,7 +338,7 @@ connman_proxy_mgr_get_technologies(connman_proxy_handler_t *connman_proxy_handle
     int8_t ret = -1;
     GVariant *res = NULL;
     GError *err = NULL;
-    
+
     connman_return_val_if_invalid_arg(connman_proxy_handler == NULL, -1);
 
     net_connman_manager_call_get_technologies_sync(connman_proxy_handler->manager_proxy, &res, NULL, &err);
