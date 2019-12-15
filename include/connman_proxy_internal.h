@@ -200,10 +200,10 @@ void connman_proxy_mgr_enable_offline_mode(connman_proxy_handler_t *connman_prox
 void connman_proxy_technology_scan(connman_proxy_handler_t *connman_proxy_handler, char *obj_path);
 void connman_proxy_technology_cleanup(gpointer free_obj, gpointer user_data);
 void connman_proxy_technology_remove(connman_proxy_handler_t *connman_proxy_handler, char *obj_path);
-void connman_proxy_technology_add_new(connman_proxy_handler_t *connman_proxy_handler, gchar *obj_path, GVariant *res);
 void connman_proxy_technology_set_power(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, gboolean powered);
 void connman_proxy_technology_property_changed_cb(NetConnmanTechnology *object, connman_proxy_handler_t *connman_proxy_handler, char *name, GVariant *value, gpointer user_data);
-connman_proxy_technology_info_t * connman_proxy_technology_find_by_path(connman_proxy_handler_t *connman_proxy_handler, const gchar *object_path);
+connman_proxy_technology_info_t *connman_proxy_technology_add_new(connman_proxy_handler_t *connman_proxy_handler, gchar *obj_path, GVariant *res);
+connman_proxy_technology_info_t *connman_proxy_technology_find_by_path(connman_proxy_handler_t *connman_proxy_handler, const gchar *object_path);
 
 /* Agent managr APIs*/
 gboolean connman_mgr_agent_init(connman_proxy_handler_t *connman_proxy_handler);

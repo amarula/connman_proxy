@@ -246,13 +246,30 @@ void
 connman_proxy_mgr_technology_added_cb(NetConnmanManager *object, char *path, GVariant *properties, gpointer user_data)
 {
     connman_proxy_handler_t *connman_proxy_handler = (connman_proxy_handler_t *)user_data;
+    connman_proxy_technology_info_t *tech_obj = NULL;
 
     connman_return_if_invalid_arg(connman_proxy_handler == NULL);
-    
+
     CONNMAN_PROXY_UNUSED(object);
     CONNMAN_LOG_INFO("Added a new Technology with Path : %s\n", path);
     CONNMAN_UTIL_PRINT_G_VARIENT(path, properties);
-    connman_proxy_technology_add_new(connman_proxy_handler, path, properties);
+    tech_obj = connman_proxy_technology_add_new(connman_proxy_handler, path, properties);
+
+    /* Notify Callback */
+    if(tech_obj && connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
+    {
+        connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
+        if(NULL == notify_data)
+            return;
+
+        notify_data->notify_type = CONNMAN_PROXY_NOTIFY_TECH_UPDATE;
+        notify_data->data.tech.type = g_strdup(tech_obj->type);
+        notify_data->data.tech.powered = tech_obj->powered;
+        notify_data->data.tech.connected = tech_obj->connected;
+        /* TODO tethering not suported yet*/
+
+        connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
+    }
 }
 
 void
@@ -260,10 +277,23 @@ connman_proxy_mgr_technology_removed_cb(NetConnmanManager *object, char *path, g
 {
     connman_proxy_handler_t *connman_proxy_handler = (connman_proxy_handler_t *)user_data;
     connman_return_if_invalid_arg(connman_proxy_handler == NULL || path == NULL);
-    
+
     CONNMAN_PROXY_UNUSED(object);
     CONNMAN_LOG_INFO("---------- A Technology Has Been Removed ---------- Path : %s\n", path);
 	connman_proxy_technology_remove(connman_proxy_handler, path);
+
+    /* Notify Callback */
+    if(connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
+    {
+        connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
+        if(NULL == notify_data)
+            return;
+
+        notify_data->notify_type = CONNMAN_PROXY_NOTIFY_TECH_UPDATE;
+        notify_data->data.tech.type = NULL;
+
+        connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
+    }
 }
 
 int8_t

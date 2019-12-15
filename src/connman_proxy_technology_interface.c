@@ -184,7 +184,7 @@ connman_proxy_technology_property_changed_cb(NetConnmanTechnology *object, connm
     }
 }
 
-void
+connman_proxy_technology_info_t *
 connman_proxy_technology_add_new(connman_proxy_handler_t *connman_proxy_handler, gchar *obj_path, GVariant *res)
 {
     GSList *path_node = NULL;
@@ -194,7 +194,7 @@ connman_proxy_technology_add_new(connman_proxy_handler_t *connman_proxy_handler,
     GError *err = NULL;
     connman_proxy_technology_info_t *tech_obj = NULL;
 
-    connman_return_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL);
+    connman_return_val_if_invalid_arg((connman_proxy_handler == NULL || obj_path == NULL), NULL);
 
     CONNMAN_LOG_TRACE("Object Path : %s\n", obj_path);
     if((path_node = g_slist_find_custom(connman_proxy_handler->technologies, obj_path, (GCompareFunc)s_connman_find_technology_by_path)))
@@ -207,7 +207,7 @@ connman_proxy_technology_add_new(connman_proxy_handler_t *connman_proxy_handler,
         if((tech_obj = g_new0(connman_proxy_technology_info_t, 1)) == NULL)
         {
             CONNMAN_LOG_ERROR("Memory Allocation Failed : %s\n", obj_path);
-            return;
+            goto safe_exit;
         }
         tech_obj->tech_proxy = net_connman_technology_proxy_new_sync(connman_proxy_handler->connection, G_DBUS_PROXY_FLAGS_NONE, CONNMAN_SERVICE, obj_path, NULL, &err);
         if(tech_obj->tech_proxy == NULL)
@@ -216,7 +216,8 @@ connman_proxy_technology_add_new(connman_proxy_handler_t *connman_proxy_handler,
             if(err)
                 g_error_free (err);
             g_free(tech_obj);
-            return;
+            tech_obj = NULL;
+            goto safe_exit;
         }
         tech_obj->obj_path = g_strdup(obj_path);
         connman_proxy_handler->technologies = g_slist_append (connman_proxy_handler->technologies, tech_obj);
@@ -236,6 +237,8 @@ connman_proxy_technology_add_new(connman_proxy_handler_t *connman_proxy_handler,
             g_free (key);
         }
     }
+safe_exit:
+    return tech_obj;
 }
 
 void
