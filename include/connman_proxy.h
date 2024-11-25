@@ -27,6 +27,10 @@
 #include <inttypes.h>
 #include <gio/gio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define  CONN_LOG_FATAL 1 /**< Only Fatal errors will be printed.*/
 #define  CONN_LOG_ERROR 2 /**< Only Errors will be printed including the Fatal error*/
 #define  CONN_LOG_WARN  3 /**< Warnings and all the errors will be printed.*/
@@ -551,5 +555,9 @@ void connman_proxy_util_print_services(connman_proxy_service_info_t *service);
 
 /* Manager APIs */
 #include <connman_mgr_agent.h>
+
+#ifdef __cplusplus
+}  // end extern "C"
+#endif
 
 #endif /* __CONNMAN_PROXY_H */
