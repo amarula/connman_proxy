@@ -120,6 +120,7 @@ typedef enum
     CONNMAN_PROXY_NOTIFY_SCAN_COMPLETED, /**< 4*/
     CONNMAN_PROXY_NOTIFY_CONNMAN_SERVICE_UPDATE, /**< 5*/
     CONNMAN_PROXY_NOTIFY_ERROR, /**< 6*/
+    CONNMAN_PROXY_NOTIFY_CLOCK_UPDATE, /**< 7*/
     CONNMAN_PROXY_NOTIFY_ENDEF  /**< Invalid notification type*/
 }connman_proxy_notify_type_t;
 
@@ -142,7 +143,8 @@ typedef enum
     CONNMAN_PROXY_CONFIG_NTPS_ERROR,                /**< 11 Failed to configure NTP server for a service*/
     CONNMAN_PROXY_CONFIG_DOMAIN_ERROR,              /**< 12 Failed to configure Domain settings of a service*/
     CONNMAN_PROXY_INVALID_KEY_ERROR,                /**< 13 Invalid Wifi Key Entered*/
-    CONNMAN_PROXY_UNKNOWN_ERROR,                    /**< 14 Unknown Error */
+    CONNMAN_PROXY_CONFIG_CLOCK_ERROR,               /**< 14 Invalid Wifi Key Entered*/
+    CONNMAN_PROXY_UNKNOWN_ERROR,                    /**< 15 Unknown Error */
 }connman_proxy_error_type_t;
 
 /*Connman manager Enum*/
@@ -181,6 +183,18 @@ typedef struct
 }connman_proxy_notify_serv_update_data_t;
 
 /**
+ * Structure object to store Information of clock
+ */
+typedef struct
+{
+    guint time;                     /**< Current system time in seconds since epoch. */
+    gchar time_updates[16];         /**< Possible values are "manual" and "auto" to indicate time update policy */
+    gchar *timezone;                /**< Current system timezone string */
+    gchar timezone_updates[16];     /**< Possible values are "manual" and "auto" to indicate time update policy */
+    GSList *timeservers;            /**< The list of Time servers */
+}connman_proxy_clock_info_t;
+
+/**
  * Structure to store all notification callback data
  */
 typedef struct
@@ -196,6 +210,7 @@ typedef struct
         connman_proxy_error_type_t error_code;          /**< Data for CONNMAN_PROXY_NOTIFY_ERROR notification contains error code.*/
         connman_proxy_notify_tech_update_data_t tech;   /**< Data for CONNMAN_PROXY_NOTIFY_TECH_UPDATE notification containing tech infomration*/
         connman_proxy_notify_serv_update_data_t serv;   /**< Data for CONNMAN_PROXY_NOTIFY_SERVICE_UPDATE notification containing service infomration*/
+        connman_proxy_clock_info_t clock;               /**< Data for CONNMAN_PROXY_NOTIFY_CLOCK_UPDATE notification containing clock information*/
     }data;
 }connman_proxy_update_cb_data_t;
 
@@ -353,6 +368,10 @@ typedef struct
 
     /* hash table of services */
     GHashTable      *services;                  /**< HasTables that contians currently available service */
+
+    /* clock informations */
+    gpointer        clock_proxy;                /**< Proxy object of the connman Clock interface */
+    connman_proxy_clock_info_t *clock;          /**< Clock interface info */
 
     /* signal handler id*/
     gulong service_changed_sid;                 /**< Signal handler for service_changed signal*/
@@ -534,6 +553,48 @@ void connman_proxy_remove_service(connman_proxy_handler_t *connman_proxy_handler
  * @param  technology A technology to scanned. Only supported on WiFi
  */
 void connman_proxy_scan_technology(connman_proxy_handler_t *connman_proxy_handler, char *technology);
+
+/***** Clock APIs ******/
+
+/**
+ * This method will be used to configure time of clock.
+ *
+ * @param  connman_proxy_handler A connman proxy handler
+ * @param  time Time in seconds since epoch.
+ */
+void connman_proxy_set_clock_time(connman_proxy_handler_t *connman_proxy_handler, uint64_t time);
+
+/**
+ * This method will be used to configure time of clock.
+ *
+ * @param  connman_proxy_handler A connman proxy handler
+ * @param  time_updates "manual" and "auto" to indicate time update policy.
+ */
+void connman_proxy_set_clock_time_updates(connman_proxy_handler_t *connman_proxy_handler, char *time_updates);
+
+/**
+ * This method will be used to configure time of clock.
+ *
+ * @param  connman_proxy_handler A connman proxy handler
+ * @param  timezone Time zone.
+ */
+void connman_proxy_set_clock_timezone(connman_proxy_handler_t *connman_proxy_handler, char *timezone);
+
+/**
+ * This method will be used to configure time of clock.
+ *
+ * @param  connman_proxy_handler A connman proxy handler
+ * @param  titimezone_updatesme "manual" and "auto" to indicate time update policy
+ */
+void connman_proxy_set_clock_timezone_updates(connman_proxy_handler_t *connman_proxy_handler, char *timezone_updates);
+
+/**
+ * This method will be used to configure time servers of clock.
+ *
+ * @param  connman_proxy_handler A connman proxy handler
+ * @param  timeserver_list String array of timeservers.
+ */
+int8_t connman_proxy_set_clock_timeserver(connman_proxy_handler_t *connman_proxy_handler, char **timeserver_list);
 
 /***** Util APIs ******/
 

@@ -37,6 +37,7 @@
 #define CONNMAN_SERVICE_INTERFACE       CONNMAN_SERVICE ".Service"
 #define CONNMAN_TECHNOLOGY_INTERFACE    CONNMAN_SERVICE ".Technology"
 #define CONNMAN_AGENT_INTERFACE         CONNMAN_SERVICE ".Agent"
+#define CONNMAN_CLOCK_INTERFACE         CONNMAN_SERVICE ".Clock"
 #define CONNMAN_MANAGER_PATH        "/"
 
 /* Property Names*/
@@ -73,6 +74,10 @@
 #define CONNMAN_PROP_INTERFACE_STR "Interface"
 #define CONNMAN_PROP_AUTOCONNECT_STR "AutoConnect"
 #define CONNMAN_PROP_PROXYLENTGH_STR "PrefixLength"
+#define CONNMAN_PROP_TIME_STR "Time"
+#define CONNMAN_PROP_TIMEUPDATES_STR "TimeUpdates"
+#define CONNMAN_PROP_TIMEZONE_STR "Timezone"
+#define CONNMAN_PROP_TIMEZONEUPDATES_STR "TimezoneUpdates"
 
 #define CONNMAN_PROXY_SAFE_FREE(ptr) \
 if(ptr != NULL)\
@@ -106,8 +111,10 @@ if(list)\
 
 #define CONNMAN_VAR_GET_STR_DUP(val, prop) \
 { \
-    if(prop)\
+    if(prop){\
+        CONNMAN_LOG_TRACE("\tString value: %s\n", prop);\
         g_free(prop);\
+    }\
 	(prop) = g_strdup(g_variant_get_string ((val), NULL)); \
     CONNMAN_LOG_TRACE("\tString value: %s\n", prop);\
 }
@@ -137,6 +144,12 @@ if(list)\
     CONNMAN_LOG_TRACE("\tUint16 value: %"PRIu16"\n", prop);\
 }
 
+#define CONNMAN_VAR_GET_UINT64(val, prop) \
+{\
+    prop = g_variant_get_uint64(val);\
+    CONNMAN_LOG_TRACE("\tUint64 value: %"PRIu64"\n", prop);\
+}
+
 #define CONNMAN_VAR_GET_BOOL(val, prop) \
 {\
     prop = g_variant_get_boolean (val);\
@@ -163,6 +176,15 @@ void connman_proxy_util_print_custom(GVariant *res);
 void connman_proxy_g_free(gpointer data, gpointer user_data);
 void connman_proxy_util_notify_error_cb(connman_proxy_handler_t *connman_proxy_handler, connman_proxy_error_type_t error_code);
 void connman_proxy_util_notify_connman_service_cb(connman_proxy_handler_t *connman_proxy_handler, gboolean available);
+
+/* Clock APIs */
+int8_t connman_proxy_clock_get_properties(connman_proxy_handler_t *connman_proxy_handler);
+void connman_proxy_clock_property_changed_cb(NetConnmanClock *object, char *name, GVariant *value, gpointer user_data);
+void connman_proxy_clock_set_time(connman_proxy_handler_t *connman_proxy_handler, guint time);
+void connman_proxy_clock_set_time_updates(connman_proxy_handler_t *connman_proxy_handler, char *time_updates);
+void connman_proxy_clock_set_timezone(connman_proxy_handler_t *connman_proxy_handler, char *timezone);
+void connman_proxy_clock_set_timezone_updates(connman_proxy_handler_t *connman_proxy_handler, char *timezone_updates);
+int8_t connman_proxy_clock_set_timeserver(connman_proxy_handler_t *connman_proxy_handler, char **timeserver);
 
 /* Service APIs */
 void connman_proxy_service_init(connman_proxy_handler_t *connman_proxy_handler);

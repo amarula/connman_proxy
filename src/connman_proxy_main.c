@@ -55,6 +55,10 @@ s_monitor_dbus_signals_cb  (GDBusConnection *connection,
     {
         connman_proxy_mgr_property_changed_cb(connman_proxy_handler->manager_proxy, string , val, user_data);
     }
+    else if(g_strcmp0(interface_name, CONNMAN_CLOCK_INTERFACE) == 0 )
+    {
+        connman_proxy_clock_property_changed_cb(connman_proxy_handler->clock_proxy, string , val, user_data);
+    }
     else if(g_strcmp0(interface_name, CONNMAN_SERVICE_INTERFACE) == 0)
     {
         connman_proxy_service_info_t *serv_obj = NULL;
@@ -114,6 +118,7 @@ s_on_name_appeared (GDBusConnection *connection,
                                                          connman_proxy_handler,
                                                          NULL);
 
+    connman_proxy_clock_get_properties(connman_proxy_handler);
     connman_proxy_mgr_get_global_system_properties(connman_proxy_handler);
     connman_proxy_mgr_get_technologies(connman_proxy_handler);
     connman_proxy_service_init(connman_proxy_handler);
@@ -197,6 +202,24 @@ connman_proxy_init(connman_proxy_callback_handlers_t *cb)
         CONNMAN_PROXY_SAFE_GFREE(connman_proxy_handler);
         goto safe_exit;
     }
+
+    connman_proxy_handler->clock_proxy = net_connman_clock_proxy_new_sync(connman_proxy_handler->connection, G_DBUS_PROXY_FLAGS_NONE,  CONNMAN_SERVICE, CONNMAN_MANAGER_PATH, NULL, &err);
+    if(connman_proxy_handler->clock_proxy == NULL)
+    {
+        CONNMAN_LOG_ERROR("xxxxxxxxxx Could Not get connman clock proxy xxxxxxxxxx : %s\n", err ? err->message : "Unknown Reason");
+        g_object_unref(connman_proxy_handler->connection);
+        CONNMAN_PROXY_SAFE_GFREE(connman_proxy_handler);
+        goto safe_exit;
+    }
+
+    connman_proxy_handler->clock = g_new0(connman_proxy_clock_info_t, 1);
+    if(connman_proxy_handler->clock == NULL)
+    {
+        CONNMAN_LOG_ERROR("xxxxxxxxxx Malloc Error xxxxxxxxxx\n");
+        goto safe_exit;
+    }
+
+
     connman_proxy_handler->watcher_id = g_bus_watch_name (G_BUS_TYPE_SYSTEM,
                                             CONNMAN_SERVICE,
                                             G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE,
@@ -356,4 +379,34 @@ CP_EXPORT int8_t
 connman_proxy_configure_domain(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, char **domain_list)
 {
     return connman_proxy_service_config_domain(connman_proxy_handler, obj_path, domain_list);
+}
+
+CP_EXPORT void
+connman_proxy_set_clock_time(connman_proxy_handler_t *connman_proxy_handler, uint64_t time)
+{
+    return connman_proxy_clock_set_time(connman_proxy_handler, time);
+}
+
+CP_EXPORT void
+connman_proxy_set_clock_time_updates(connman_proxy_handler_t *connman_proxy_handler, char *time_updates)
+{
+    return connman_proxy_clock_set_time_updates(connman_proxy_handler, time_updates);
+}
+
+CP_EXPORT void
+connman_proxy_set_clock_timezone(connman_proxy_handler_t *connman_proxy_handler, char *timezone)
+{
+    return connman_proxy_clock_set_timezone(connman_proxy_handler, timezone);
+}
+
+CP_EXPORT void
+connman_proxy_set_clock_timezone_updates(connman_proxy_handler_t *connman_proxy_handler, char *timezone_updates)
+{
+    return connman_proxy_clock_set_timezone_updates(connman_proxy_handler, timezone_updates);
+}
+
+CP_EXPORT int8_t
+connman_proxy_set_clock_timeserver(connman_proxy_handler_t *connman_proxy_handler, char **timeserver_list)
+{
+    return connman_proxy_clock_set_timeserver(connman_proxy_handler, timeserver_list);
 }

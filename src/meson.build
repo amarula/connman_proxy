@@ -5,6 +5,7 @@ libconnmanproxy_sources = ['connman_proxy_main.c',
                            'connman_proxy_technology_interface.c',
                            'connman_mgr_agent_interface.c',
                            'connman_proxy_utils.c',
+                           'connman_proxy_clock_interface.c',
                            generated_src]
 
 lib_dep = [gio_dep, gio_unix_dep]
