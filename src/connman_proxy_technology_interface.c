@@ -22,280 +22,280 @@
  */
 
 #define _GNU_SOURCE
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 #include <unistd.h>
 
 #include "connman_proxy.h"
 #include "connman_proxy_internal.h"
 
 #define CONNMAN_PROXY_TECH_PARSE_PROPERTY(tech_obj, key, value) \
-        if(strcmp(key, CONNMAN_PROP_NAME_STR) == 0) \
-            CONNMAN_VAR_GET_STR_DUP(value, tech_obj->name) \
-        else if(strcmp(key, CONNMAN_PROP_TYPE_STR) == 0) \
-            CONNMAN_VAR_GET_STR_DUP(value, tech_obj->type) \
-        else if(strcmp(key, CONNMAN_PROP_POWERED_STR) == 0) \
-            CONNMAN_VAR_GET_BOOL(value, tech_obj->powered) \
-        else if(strcmp(key, CONNMAN_PROP_CONNECTED_STR) == 0) \
-            CONNMAN_VAR_GET_BOOL(value, tech_obj->connected) \
-        else if(strcmp(key, CONNMAN_PROP_TETHERING_STR) == 0) \
-            CONNMAN_VAR_GET_BOOL(value, tech_obj->tethering) \
-        else \
-        { \
-            CONNMAN_LOG_WARNING("Unknown Property : %s\n", key); \
-        }
+  if (strcmp (key, CONNMAN_PROP_NAME_STR) == 0)                 \
+    CONNMAN_VAR_GET_STR_DUP (value, tech_obj->name)             \
+  else if (strcmp (key, CONNMAN_PROP_TYPE_STR) == 0)            \
+    CONNMAN_VAR_GET_STR_DUP (value, tech_obj->type)             \
+  else if (strcmp (key, CONNMAN_PROP_POWERED_STR) == 0)         \
+    CONNMAN_VAR_GET_BOOL (value, tech_obj->powered)             \
+  else if (strcmp (key, CONNMAN_PROP_CONNECTED_STR) == 0)       \
+    CONNMAN_VAR_GET_BOOL (value, tech_obj->connected)           \
+  else if (strcmp (key, CONNMAN_PROP_TETHERING_STR) == 0)       \
+    CONNMAN_VAR_GET_BOOL (value, tech_obj->tethering)           \
+  else                                                          \
+    {                                                           \
+      CONNMAN_LOG_WARNING ("Unknown Property : %s\n", key);     \
+    }
 
 /**** Static ****/
 
 static gint
-s_connman_find_technology_by_path(gpointer a, gpointer b)
+s_connman_find_technology_by_path (gpointer a, gpointer b)
 {
-    connman_proxy_technology_info_t *tech_obj = a;
-    CONNMAN_LOG_TRACE("Matching %s vs %s\n", (char *)b, tech_obj->obj_path);
-    return strcmp(b, tech_obj->obj_path);
+  connman_proxy_technology_info_t *tech_obj = a;
+  CONNMAN_LOG_TRACE ("Matching %s vs %s\n", (char *) b, tech_obj->obj_path);
+  return strcmp (b, tech_obj->obj_path);
 }
 
 static void
 s_connman_proxy_tech_scan_cb (GDBusProxy *proxy,
-                                GAsyncResult *res,
-                                gpointer      user_data)
+                              GAsyncResult *res,
+                              gpointer user_data)
 {
-    GError *error = NULL;
-    gboolean ret  =  FALSE;
-    connman_proxy_handler_t *connman_proxy_handler =  (connman_proxy_handler_t *)user_data;
+  GError *error = NULL;
+  gboolean ret = FALSE;
+  connman_proxy_handler_t *connman_proxy_handler = (connman_proxy_handler_t *) user_data;
 
-    connman_return_if_invalid_arg(NULL == connman_proxy_handler);
+  connman_return_if_invalid_arg (NULL == connman_proxy_handler);
 
-    ret = net_connman_technology_call_scan_finish (NET_CONNMAN_TECHNOLOGY(proxy), res, &error);
+  ret = net_connman_technology_call_scan_finish (NET_CONNMAN_TECHNOLOGY (proxy), res, &error);
 
-    if(ret == TRUE)
+  if (ret == TRUE)
     {
-        connman_proxy_update_cb_data_t *notify_data = NULL;
-        CONNMAN_LOG_INFO("Scan Completed...\n");
-        if(connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
-            notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
-        if(notify_data)
+      connman_proxy_update_cb_data_t *notify_data = NULL;
+      CONNMAN_LOG_INFO ("Scan Completed...\n");
+      if (connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
+        notify_data = (connman_proxy_update_cb_data_t *) malloc (sizeof (connman_proxy_update_cb_data_t));
+      if (notify_data)
         {
-            notify_data->notify_type = CONNMAN_PROXY_NOTIFY_SCAN_COMPLETED;
-            connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
+          notify_data->notify_type = CONNMAN_PROXY_NOTIFY_SCAN_COMPLETED;
+          connman_proxy_handler->cb->on_update (notify_data, connman_proxy_handler->cb->cookie);
         }
     }
-    else
+  else
     {
-        CONNMAN_LOG_ERROR("Scan Failed : %s\n", (error && error->message) ? error->message : "Unknown Reason");
-        connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_SCAN_ERROR);
-        if(error)
-            g_error_free (error);
+      CONNMAN_LOG_ERROR ("Scan Failed : %s\n", (error && error->message) ? error->message : "Unknown Reason");
+      connman_proxy_util_notify_error_cb (connman_proxy_handler, CONNMAN_PROXY_SCAN_ERROR);
+      if (error)
+        g_error_free (error);
     }
 }
 
 static void
 s_connman_proxy_tech_powered_cb (GDBusProxy *proxy,
-                                GAsyncResult *res,
-                                connman_proxy_handler_t *connman_proxy_handler)
+                                 GAsyncResult *res,
+                                 connman_proxy_handler_t *connman_proxy_handler)
 {
-    GError *error = NULL;
-    gboolean ret  =  FALSE;
+  GError *error = NULL;
+  gboolean ret = FALSE;
 
-    ret = net_connman_technology_call_set_property_finish (NET_CONNMAN_TECHNOLOGY(proxy), res, &error);
-    if(ret == TRUE)
+  ret = net_connman_technology_call_set_property_finish (NET_CONNMAN_TECHNOLOGY (proxy), res, &error);
+  if (ret == TRUE)
     {
-        CONNMAN_LOG_INFO("Configured Power : %s\n", connman_proxy_handler->user_data_1 ? (char *)connman_proxy_handler->user_data_1 :"Unknown Tech");
+      CONNMAN_LOG_INFO ("Configured Power : %s\n", connman_proxy_handler->user_data_1 ? (char *) connman_proxy_handler->user_data_1 : "Unknown Tech");
     }
-    else
+  else
     {
-        if(connman_proxy_handler)
+      if (connman_proxy_handler)
         {
-            CONNMAN_LOG_ERROR("Couldnt Set Power [%s]: %s\n", connman_proxy_handler->user_data_1 ? (char*)connman_proxy_handler->user_data_1 : "Unknown Tech", (error && error->message) ? error->message : "Unknown Reason");
-            connman_proxy_util_notify_error_cb(connman_proxy_handler, CONNMAN_PROXY_CONFIG_POWER_ERROR);
-            if(connman_proxy_handler->user_data_1)
-                g_free(connman_proxy_handler->user_data_1);
+          CONNMAN_LOG_ERROR ("Couldnt Set Power [%s]: %s\n", connman_proxy_handler->user_data_1 ? (char *) connman_proxy_handler->user_data_1 : "Unknown Tech", (error && error->message) ? error->message : "Unknown Reason");
+          connman_proxy_util_notify_error_cb (connman_proxy_handler, CONNMAN_PROXY_CONFIG_POWER_ERROR);
+          if (connman_proxy_handler->user_data_1)
+            g_free (connman_proxy_handler->user_data_1);
         }
-        if(error)
-            g_error_free (error);
+      if (error)
+        g_error_free (error);
     }
 }
 
 /**** Hidden ****/
 
 connman_proxy_technology_info_t *
-connman_proxy_technology_find_by_path(connman_proxy_handler_t *connman_proxy_handler, const gchar *object_path)
+connman_proxy_technology_find_by_path (connman_proxy_handler_t *connman_proxy_handler, const gchar *object_path)
 {
-    GSList *path_node = NULL;
-    connman_proxy_technology_info_t *tech_obj = NULL;
+  GSList *path_node = NULL;
+  connman_proxy_technology_info_t *tech_obj = NULL;
 
-    connman_return_val_if_invalid_arg(connman_proxy_handler == NULL || object_path == NULL, NULL);
+  connman_return_val_if_invalid_arg (connman_proxy_handler == NULL || object_path == NULL, NULL);
 
-    if((path_node = g_slist_find_custom(connman_proxy_handler->technologies, object_path, (GCompareFunc)s_connman_find_technology_by_path)))
-        tech_obj = path_node->data;
-    else
+  if ((path_node = g_slist_find_custom (connman_proxy_handler->technologies, object_path, (GCompareFunc) s_connman_find_technology_by_path)))
+    tech_obj = path_node->data;
+  else
     {
-        CONNMAN_LOG_WARNING("Could Not Find technology with path : %s\n", object_path);
+      CONNMAN_LOG_WARNING ("Could Not Find technology with path : %s\n", object_path);
     }
 
-    return tech_obj;
+  return tech_obj;
 }
 
 void
-connman_proxy_technology_cleanup(gpointer free_obj, gpointer user_data)
+connman_proxy_technology_cleanup (gpointer free_obj, gpointer user_data)
 {
-    connman_proxy_technology_info_t *tech_obj = (connman_proxy_technology_info_t *)free_obj;
-    connman_return_if_invalid_arg(tech_obj == NULL);
-        
-    CONNMAN_PROXY_UNUSED(user_data);
+  connman_proxy_technology_info_t *tech_obj = (connman_proxy_technology_info_t *) free_obj;
+  connman_return_if_invalid_arg (tech_obj == NULL);
 
-    CONNMAN_PROXY_SAFE_GFREE(tech_obj->obj_path);
-    CONNMAN_PROXY_SAFE_GFREE(tech_obj->name);
-    CONNMAN_PROXY_SAFE_GFREE(tech_obj->type);
+  CONNMAN_PROXY_UNUSED (user_data);
 
-    g_object_unref(tech_obj->tech_proxy);
+  CONNMAN_PROXY_SAFE_GFREE (tech_obj->obj_path);
+  CONNMAN_PROXY_SAFE_GFREE (tech_obj->name);
+  CONNMAN_PROXY_SAFE_GFREE (tech_obj->type);
 
-    free(tech_obj);
+  g_object_unref (tech_obj->tech_proxy);
+
+  free (tech_obj);
 }
 
 void
-connman_proxy_technology_property_changed_cb(NetConnmanTechnology *object, connman_proxy_handler_t *connman_proxy_handler, char *name, GVariant *unboxed_value, gpointer user_data)
+connman_proxy_technology_property_changed_cb (NetConnmanTechnology *object, connman_proxy_handler_t *connman_proxy_handler, char *name, GVariant *unboxed_value, gpointer user_data)
 {
-    connman_proxy_technology_info_t *tech_obj = (connman_proxy_technology_info_t *) user_data;
+  connman_proxy_technology_info_t *tech_obj = (connman_proxy_technology_info_t *) user_data;
 
-    connman_return_if_invalid_arg(NULL == tech_obj || NULL == connman_proxy_handler);
+  connman_return_if_invalid_arg (NULL == tech_obj || NULL == connman_proxy_handler);
 
-    CONNMAN_PROXY_UNUSED(object);
-    CONNMAN_LOG_DEBUG("[%s] Property Changed : %s\n", (char *) tech_obj->obj_path, name);
-    connman_proxy_util_print_g_variant(name, unboxed_value);
-    CONNMAN_PROXY_TECH_PARSE_PROPERTY(tech_obj, name, unboxed_value);
+  CONNMAN_PROXY_UNUSED (object);
+  CONNMAN_LOG_DEBUG ("[%s] Property Changed : %s\n", (char *) tech_obj->obj_path, name);
+  connman_proxy_util_print_g_variant (name, unboxed_value);
+  CONNMAN_PROXY_TECH_PARSE_PROPERTY (tech_obj, name, unboxed_value);
 
-    /* Notify Callback */
-    if(connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
+  /* Notify Callback */
+  if (connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
     {
-        connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
-        if(NULL == notify_data)
-            return;
+      connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t *) malloc (sizeof (connman_proxy_update_cb_data_t));
+      if (NULL == notify_data)
+        return;
 
-        notify_data->data.tech.type = g_strdup(tech_obj->type);
-        notify_data->notify_type = CONNMAN_PROXY_NOTIFY_TECH_UPDATE;
-        notify_data->data.tech.powered = tech_obj->powered;
-        notify_data->data.tech.connected = tech_obj->connected;
-        /* TODO tethering not suported yet*/
+      notify_data->data.tech.type = g_strdup (tech_obj->type);
+      notify_data->notify_type = CONNMAN_PROXY_NOTIFY_TECH_UPDATE;
+      notify_data->data.tech.powered = tech_obj->powered;
+      notify_data->data.tech.connected = tech_obj->connected;
+      /* TODO tethering not suported yet*/
 
-        connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
+      connman_proxy_handler->cb->on_update (notify_data, connman_proxy_handler->cb->cookie);
     }
 }
 
 connman_proxy_technology_info_t *
-connman_proxy_technology_add_new(connman_proxy_handler_t *connman_proxy_handler, gchar *obj_path, GVariant *res)
+connman_proxy_technology_add_new (connman_proxy_handler_t *connman_proxy_handler, gchar *obj_path, GVariant *res)
 {
-    GSList *path_node = NULL;
-    gchar *key = NULL;
-    GVariantIter iter;
-    GVariant *value = NULL;
-    GError *err = NULL;
-    connman_proxy_technology_info_t *tech_obj = NULL;
+  GSList *path_node = NULL;
+  gchar *key = NULL;
+  GVariantIter iter;
+  GVariant *value = NULL;
+  GError *err = NULL;
+  connman_proxy_technology_info_t *tech_obj = NULL;
 
-    connman_return_val_if_invalid_arg((connman_proxy_handler == NULL || obj_path == NULL), NULL);
+  connman_return_val_if_invalid_arg ((connman_proxy_handler == NULL || obj_path == NULL), NULL);
 
-    CONNMAN_LOG_TRACE("Object Path : %s\n", obj_path);
-    if((path_node = g_slist_find_custom(connman_proxy_handler->technologies, obj_path, (GCompareFunc)s_connman_find_technology_by_path)))
+  CONNMAN_LOG_TRACE ("Object Path : %s\n", obj_path);
+  if ((path_node = g_slist_find_custom (connman_proxy_handler->technologies, obj_path, (GCompareFunc) s_connman_find_technology_by_path)))
     {
-        tech_obj = path_node->data;
-        CONNMAN_LOG_INFO("^^^^^^^^^^ A Technology Has Been Updated ^^^^^^^^^^ Path : %s and type %s\n", tech_obj->obj_path, tech_obj->type);
+      tech_obj = path_node->data;
+      CONNMAN_LOG_INFO ("^^^^^^^^^^ A Technology Has Been Updated ^^^^^^^^^^ Path : %s and type %s\n", tech_obj->obj_path, tech_obj->type);
     }
-    else /* We didnt find node with matching dbus object path so create a new node to add*/
+  else /* We didnt find node with matching dbus object path so create a new node to add*/
     {
-        if((tech_obj = g_new0(connman_proxy_technology_info_t, 1)) == NULL)
+      if ((tech_obj = g_new0 (connman_proxy_technology_info_t, 1)) == NULL)
         {
-            CONNMAN_LOG_ERROR("Memory Allocation Failed : %s\n", obj_path);
-            goto safe_exit;
+          CONNMAN_LOG_ERROR ("Memory Allocation Failed : %s\n", obj_path);
+          goto safe_exit;
         }
-        tech_obj->tech_proxy = net_connman_technology_proxy_new_sync(connman_proxy_handler->connection, G_DBUS_PROXY_FLAGS_NONE, CONNMAN_SERVICE, obj_path, NULL, &err);
-        if(tech_obj->tech_proxy == NULL)
+      tech_obj->tech_proxy = net_connman_technology_proxy_new_sync (connman_proxy_handler->connection, G_DBUS_PROXY_FLAGS_NONE, CONNMAN_SERVICE, obj_path, NULL, &err);
+      if (tech_obj->tech_proxy == NULL)
         {
-            CONNMAN_LOG_ERROR("Could Not Connect to Service Proxy %s : %s\n", obj_path, err ? err->message : "Unknown Reason");
-            if(err)
-                g_error_free (err);
-            g_free(tech_obj);
-            tech_obj = NULL;
-            goto safe_exit;
+          CONNMAN_LOG_ERROR ("Could Not Connect to Service Proxy %s : %s\n", obj_path, err ? err->message : "Unknown Reason");
+          if (err)
+            g_error_free (err);
+          g_free (tech_obj);
+          tech_obj = NULL;
+          goto safe_exit;
         }
-        tech_obj->obj_path = g_strdup(obj_path);
-        connman_proxy_handler->technologies = g_slist_append (connman_proxy_handler->technologies, tech_obj);
-        CONNMAN_LOG_INFO("+++++++++++ A New Technology Has Been Added +++++++++++ Path : %s\n", obj_path);
+      tech_obj->obj_path = g_strdup (obj_path);
+      connman_proxy_handler->technologies = g_slist_append (connman_proxy_handler->technologies, tech_obj);
+      CONNMAN_LOG_INFO ("+++++++++++ A New Technology Has Been Added +++++++++++ Path : %s\n", obj_path);
     }
 
-    /* Parse property and update */
-    if(res)
+  /* Parse property and update */
+  if (res)
     {
-        g_variant_iter_init (&iter, res);
-        while (g_variant_iter_next (&iter, "{sv}", &key, &value))
+      g_variant_iter_init (&iter, res);
+      while (g_variant_iter_next (&iter, "{sv}", &key, &value))
         {
-            CONNMAN_PROXY_TECH_PARSE_PROPERTY(tech_obj, key, value);
+          CONNMAN_PROXY_TECH_PARSE_PROPERTY (tech_obj, key, value);
 
-            /*must free data for ourselves*/
-            g_variant_unref (value);
-            g_free (key);
+          /*must free data for ourselves*/
+          g_variant_unref (value);
+          g_free (key);
         }
     }
 safe_exit:
-    return tech_obj;
+  return tech_obj;
 }
 
 void
-connman_proxy_technology_remove(connman_proxy_handler_t *connman_proxy_handler, char *obj_path)
+connman_proxy_technology_remove (connman_proxy_handler_t *connman_proxy_handler, char *obj_path)
 {
-    GSList *path_node = NULL;
-    connman_proxy_technology_info_t *tech_obj = NULL;
-	
-    connman_return_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL);
+  GSList *path_node = NULL;
+  connman_proxy_technology_info_t *tech_obj = NULL;
 
-    if((path_node = g_slist_find_custom(connman_proxy_handler->technologies, obj_path, (GCompareFunc)s_connman_find_technology_by_path)))
+  connman_return_if_invalid_arg (connman_proxy_handler == NULL || obj_path == NULL);
+
+  if ((path_node = g_slist_find_custom (connman_proxy_handler->technologies, obj_path, (GCompareFunc) s_connman_find_technology_by_path)))
     {
-        tech_obj = path_node->data;
-        CONNMAN_LOG_DEBUG("Found Technology Node %p with Object path %s and type %s\n", tech_obj, tech_obj->obj_path, tech_obj->type);
+      tech_obj = path_node->data;
+      CONNMAN_LOG_DEBUG ("Found Technology Node %p with Object path %s and type %s\n", tech_obj, tech_obj->obj_path, tech_obj->type);
 
-        connman_proxy_handler->technologies = g_slist_remove (connman_proxy_handler->technologies, tech_obj);
-        connman_proxy_technology_cleanup(tech_obj, NULL);
-    }
-}
-
-void
-connman_proxy_technology_scan(connman_proxy_handler_t *connman_proxy_handler, char *obj_path)
-{
-    GSList *path_node = NULL;
-    connman_proxy_technology_info_t *tech_obj = NULL;
-    connman_return_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL);
-
-    if((path_node = g_slist_find_custom(connman_proxy_handler->technologies, obj_path, (GCompareFunc)s_connman_find_technology_by_path)))
-    {
-        tech_obj = path_node->data;
-        CONNMAN_LOG_DEBUG("Found Technology Node %p with Object path %s and type %s\n", tech_obj, tech_obj->obj_path, tech_obj->type);
-        net_connman_technology_call_scan(tech_obj->tech_proxy, NULL, (GAsyncReadyCallback)s_connman_proxy_tech_scan_cb, connman_proxy_handler);
-    }
-    else
-    {
-        CONNMAN_LOG_ERROR("Invalid Technology Object To Scan : %s\n", obj_path);
+      connman_proxy_handler->technologies = g_slist_remove (connman_proxy_handler->technologies, tech_obj);
+      connman_proxy_technology_cleanup (tech_obj, NULL);
     }
 }
 
 void
-connman_proxy_technology_set_power(connman_proxy_handler_t *connman_proxy_handler, char *obj_path, gboolean powered)
+connman_proxy_technology_scan (connman_proxy_handler_t *connman_proxy_handler, char *obj_path)
 {
-    GSList *path_node = NULL;
-    connman_proxy_technology_info_t *tech_obj = NULL;
-	
-    connman_return_if_invalid_arg(connman_proxy_handler == NULL || obj_path == NULL);
+  GSList *path_node = NULL;
+  connman_proxy_technology_info_t *tech_obj = NULL;
+  connman_return_if_invalid_arg (connman_proxy_handler == NULL || obj_path == NULL);
 
-    if((path_node = g_slist_find_custom(connman_proxy_handler->technologies, obj_path, (GCompareFunc)s_connman_find_technology_by_path)))
+  if ((path_node = g_slist_find_custom (connman_proxy_handler->technologies, obj_path, (GCompareFunc) s_connman_find_technology_by_path)))
     {
-        tech_obj = path_node->data;
-        CONNMAN_LOG_DEBUG("Found Technology Node %p with Object path %s and type %s\n", tech_obj, tech_obj->obj_path, tech_obj->type);
-        connman_proxy_handler->user_data_1 = g_strdup(tech_obj->name);
-        net_connman_technology_call_set_property(tech_obj->tech_proxy, CONNMAN_PROP_POWERED_STR, g_variant_new("v", g_variant_new_boolean (powered)), NULL, (GAsyncReadyCallback) s_connman_proxy_tech_powered_cb, connman_proxy_handler);
+      tech_obj = path_node->data;
+      CONNMAN_LOG_DEBUG ("Found Technology Node %p with Object path %s and type %s\n", tech_obj, tech_obj->obj_path, tech_obj->type);
+      net_connman_technology_call_scan (tech_obj->tech_proxy, NULL, (GAsyncReadyCallback) s_connman_proxy_tech_scan_cb, connman_proxy_handler);
     }
-    else
+  else
     {
-        CONNMAN_LOG_ERROR("Invalid Technology Object To Configure Power : %s\n", obj_path);
+      CONNMAN_LOG_ERROR ("Invalid Technology Object To Scan : %s\n", obj_path);
+    }
+}
+
+void
+connman_proxy_technology_set_power (connman_proxy_handler_t *connman_proxy_handler, char *obj_path, gboolean powered)
+{
+  GSList *path_node = NULL;
+  connman_proxy_technology_info_t *tech_obj = NULL;
+
+  connman_return_if_invalid_arg (connman_proxy_handler == NULL || obj_path == NULL);
+
+  if ((path_node = g_slist_find_custom (connman_proxy_handler->technologies, obj_path, (GCompareFunc) s_connman_find_technology_by_path)))
+    {
+      tech_obj = path_node->data;
+      CONNMAN_LOG_DEBUG ("Found Technology Node %p with Object path %s and type %s\n", tech_obj, tech_obj->obj_path, tech_obj->type);
+      connman_proxy_handler->user_data_1 = g_strdup (tech_obj->name);
+      net_connman_technology_call_set_property (tech_obj->tech_proxy, CONNMAN_PROP_POWERED_STR, g_variant_new ("v", g_variant_new_boolean (powered)), NULL, (GAsyncReadyCallback) s_connman_proxy_tech_powered_cb, connman_proxy_handler);
+    }
+  else
+    {
+      CONNMAN_LOG_ERROR ("Invalid Technology Object To Configure Power : %s\n", obj_path);
     }
 }
 

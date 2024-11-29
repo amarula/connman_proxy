@@ -37,13 +37,13 @@
  *
  * returns TRUE if the call is success, otherwise FALSE
  */
-gboolean connman_mgr_set_user_input(connman_mgr_request_input_type_t input_type, GVariant *response);
+gboolean connman_mgr_set_user_input (connman_mgr_request_input_type_t input_type, GVariant *response);
 
 /**
  * This method will be used to cancel user input request.
  *
  * @param  input_type Type of input request : connman_mgr_request_input_type_t
  */
-void connman_mgr_cancel_user_input(connman_mgr_request_input_type_t input_type);
+void connman_mgr_cancel_user_input (connman_mgr_request_input_type_t input_type);
 
 #endif /*__CONNMAN_MGR_AGENT_H*/

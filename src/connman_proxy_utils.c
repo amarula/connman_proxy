@@ -22,10 +22,10 @@
  */
 
 #define _GNU_SOURCE
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 #include <unistd.h>
 
 #include "connman_proxy.h"
@@ -38,215 +38,213 @@ char *s_depth_tab_str = "\t\t\t\t\t\t\t\t\t\t";
 /**** Hidden ****/
 
 void
-connman_proxy_util_notify_error_cb(connman_proxy_handler_t *connman_proxy_handler, connman_proxy_error_type_t error_code)
+connman_proxy_util_notify_error_cb (connman_proxy_handler_t *connman_proxy_handler, connman_proxy_error_type_t error_code)
 {
-    connman_return_if_invalid_arg(NULL == connman_proxy_handler);
+  connman_return_if_invalid_arg (NULL == connman_proxy_handler);
 
-    if(connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
+  if (connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
     {
-        connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
-        if(NULL == notify_data)
-            return;
+      connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t *) malloc (sizeof (connman_proxy_update_cb_data_t));
+      if (NULL == notify_data)
+        return;
 
-        notify_data->notify_type = CONNMAN_PROXY_NOTIFY_ERROR;
-        notify_data->data.error_code = error_code;
-        connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
+      notify_data->notify_type = CONNMAN_PROXY_NOTIFY_ERROR;
+      notify_data->data.error_code = error_code;
+      connman_proxy_handler->cb->on_update (notify_data, connman_proxy_handler->cb->cookie);
     }
 }
 
 void
-connman_proxy_util_notify_connman_service_cb(connman_proxy_handler_t *connman_proxy_handler, gboolean available)
+connman_proxy_util_notify_connman_service_cb (connman_proxy_handler_t *connman_proxy_handler, gboolean available)
 {
-    connman_return_if_invalid_arg(NULL == connman_proxy_handler);
+  connman_return_if_invalid_arg (NULL == connman_proxy_handler);
 
-    if(connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
+  if (connman_proxy_handler->cb && connman_proxy_handler->cb->on_update)
     {
-        connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t*) malloc(sizeof(connman_proxy_update_cb_data_t));
-        if(NULL == notify_data)
-            return;
+      connman_proxy_update_cb_data_t *notify_data = (connman_proxy_update_cb_data_t *) malloc (sizeof (connman_proxy_update_cb_data_t));
+      if (NULL == notify_data)
+        return;
 
-        notify_data->notify_type = CONNMAN_PROXY_NOTIFY_CONNMAN_SERVICE_UPDATE;
-        notify_data->data.service_available = available;
-        connman_proxy_handler->cb->on_update(notify_data, connman_proxy_handler->cb->cookie);
+      notify_data->notify_type = CONNMAN_PROXY_NOTIFY_CONNMAN_SERVICE_UPDATE;
+      notify_data->data.service_available = available;
+      connman_proxy_handler->cb->on_update (notify_data, connman_proxy_handler->cb->cookie);
     }
 }
 
 void
-connman_proxy_util_print_array_of_string(GVariant *res)
+connman_proxy_util_print_array_of_string (GVariant *res)
 {
-    GVariantIter iter;
-    gchar *value;
+  GVariantIter iter;
+  gchar *value;
 
-    g_variant_iter_init (&iter, res);
-    while (g_variant_iter_next (&iter, "s", &value))
+  g_variant_iter_init (&iter, res);
+  while (g_variant_iter_next (&iter, "s", &value))
     {
-        CONNMAN_LOG_USER("\t%s\n", value);
-        g_free (value);
+      CONNMAN_LOG_USER ("\t%s\n", value);
+      g_free (value);
     }
 }
 
 void
-connman_proxy_util_print_custom(GVariant *res)
+connman_proxy_util_print_custom (GVariant *res)
 {
-    if(g_strcmp0(g_variant_get_type_string (res), "(sv)") == 0 )
+  if (g_strcmp0 (g_variant_get_type_string (res), "(sv)") == 0)
     {
-        GVariant *val = NULL;
-        gchar *string = NULL;
-        g_variant_get (res, "(sv)", &string, &val);
-        connman_proxy_util_print_g_variant(string, val);
-        g_free (string);
-        g_variant_unref (val);
+      GVariant *val = NULL;
+      gchar *string = NULL;
+      g_variant_get (res, "(sv)", &string, &val);
+      connman_proxy_util_print_g_variant (string, val);
+      g_free (string);
+      g_variant_unref (val);
     }
-    else
+  else
     {
-        CONNMAN_LOG_WARNING("%-12s : Unknown Property of type '%s'\n", "test", g_variant_get_type_string (res));
-    }
-}
-
-void
-connman_proxy_util_print_array_of_dict(GVariant *res)
-{
-    GVariantIter iter;
-    GVariant *value;
-    gchar *key;
-
-    g_variant_iter_init (&iter, res);
-    while (g_variant_iter_next (&iter, "{sv}", &key, &value))
-    {
-        connman_proxy_util_print_g_variant(key, value);
-        /*must free data for ourselves*/
-        g_variant_unref (value);
-        g_free (key);
+      CONNMAN_LOG_WARNING ("%-12s : Unknown Property of type '%s'\n", "test", g_variant_get_type_string (res));
     }
 }
 
 void
-connman_proxy_g_free(gpointer data, gpointer user_data)
+connman_proxy_util_print_array_of_dict (GVariant *res)
 {
-    CONNMAN_PROXY_UNUSED(user_data);
-    g_free(data);
+  GVariantIter iter;
+  GVariant *value;
+  gchar *key;
+
+  g_variant_iter_init (&iter, res);
+  while (g_variant_iter_next (&iter, "{sv}", &key, &value))
+    {
+      connman_proxy_util_print_g_variant (key, value);
+      /*must free data for ourselves*/
+      g_variant_unref (value);
+      g_free (key);
+    }
+}
+
+void
+connman_proxy_g_free (gpointer data, gpointer user_data)
+{
+  CONNMAN_PROXY_UNUSED (user_data);
+  g_free (data);
 }
 
 /**** Global ****/
 
 CP_EXPORT void
-connman_proxy_util_print_services(connman_proxy_service_info_t *service)
+connman_proxy_util_print_services (connman_proxy_service_info_t *service)
 {
-    CONNMAN_LOG_USER("\n************* Service %s *************\n", service->obj_path); 
-    CONNMAN_LOG_USER( "\t\tService Name     : %s\n"
-                      "\t\tName             : %s\n"
-                      "\t\tType             : %s\n"
-                      "\t\tSignale Strength : %hhu\n"
-                      "\t\tState            : %s\n"
-                      "\t\tFavourite        : %s\n"
-                      "\t\tImmutable        : %s\n"
-                      "\t\tAutoconnect      : %s\n"
-                      "\t\tMDNS Enabled     : %s\n"
-                      "\t\tIPV4\n"
-                      "\t\t\tMethod         :%s\n"
-                      "\t\t\tAddress        :%s\n"
-                      "\t\t\tNetMask        :%s\n"
-                      "\t\t\tGateWay        :%s\n"
-                      "\t\tEthernet\n"
-                      "\t\t\tMethod         :%s\n"
-                      "\t\t\tInterface      :%s\n"
-                      "\t\t\tMac Address    :%s\n"
-                      "\t\t\tMTU            :%hu\n"
-                      "\t\tNetwork Proxy\n"
-                      "\t\t\tMethod         :%s\n"
-                      "\t\t\tURL            :%s\n"
-                      ,   
-                        service->service_name, service->name ? service->name : "Hidden", service->type, service->signal_strength, service->state,
-                        service->favorite ? "Yes": "No", service->immutable ? "Yes": "No", service->autoconnect ? "Yes": "No", service->mdns ? "Yes": "No",
-                        service->ipv4.method, service->ipv4.address, service->ipv4.netmask, service->ipv4.gateway,
-                        service->eth.method, service->eth.interface, service->eth.address, service->eth.mtu,
-                        service->proxy.method, service->proxy.url ? service->proxy.url : "");
+  CONNMAN_LOG_USER ("\n************* Service %s *************\n", service->obj_path);
+  CONNMAN_LOG_USER ("\t\tService Name     : %s\n"
+                    "\t\tName             : %s\n"
+                    "\t\tType             : %s\n"
+                    "\t\tSignale Strength : %hhu\n"
+                    "\t\tState            : %s\n"
+                    "\t\tFavourite        : %s\n"
+                    "\t\tImmutable        : %s\n"
+                    "\t\tAutoconnect      : %s\n"
+                    "\t\tMDNS Enabled     : %s\n"
+                    "\t\tIPV4\n"
+                    "\t\t\tMethod         :%s\n"
+                    "\t\t\tAddress        :%s\n"
+                    "\t\t\tNetMask        :%s\n"
+                    "\t\t\tGateWay        :%s\n"
+                    "\t\tEthernet\n"
+                    "\t\t\tMethod         :%s\n"
+                    "\t\t\tInterface      :%s\n"
+                    "\t\t\tMac Address    :%s\n"
+                    "\t\t\tMTU            :%hu\n"
+                    "\t\tNetwork Proxy\n"
+                    "\t\t\tMethod         :%s\n"
+                    "\t\t\tURL            :%s\n",
+                    service->service_name, service->name ? service->name : "Hidden", service->type, service->signal_strength, service->state,
+                    service->favorite ? "Yes" : "No", service->immutable ? "Yes" : "No", service->autoconnect ? "Yes" : "No", service->mdns ? "Yes" : "No",
+                    service->ipv4.method, service->ipv4.address, service->ipv4.netmask, service->ipv4.gateway,
+                    service->eth.method, service->eth.interface, service->eth.address, service->eth.mtu,
+                    service->proxy.method, service->proxy.url ? service->proxy.url : "");
 
-	/* To print PROXY/DNS/NTP/DOMAIN servers*/
-	{   
-		GSList  *tmp = NULL;
-		int i = 0;
-		for (i = 0, tmp = service->proxy.servers; tmp; tmp = g_slist_next (tmp), i++)
-		{   
-			CONNMAN_LOG_USER("\t\t\tPROXY %d - %s\n", i, (char *)tmp->data);
-		}   
-		CONNMAN_LOG_USER("\t\tExcludes\n");
-		for (i = 0, tmp = service->proxy.exclude; tmp; tmp = g_slist_next (tmp), i++)
-		{   
-			CONNMAN_LOG_USER("\t\t\tEXCLUDE %d - %s\n", i, (char *)tmp->data);
-		}   
-		CONNMAN_LOG_USER("\t\tSecurity\n");
-		for (i = 0, tmp = service->security; tmp; tmp = g_slist_next (tmp), i++)
-		{   
-			CONNMAN_LOG_USER("\t\t\tSecurity %d - %s\n", i, (char *)tmp->data);
-		}   
-		CONNMAN_LOG_USER("\t\tDNS\n");
-		for (i = 0, tmp = service->nameservers; tmp; tmp = g_slist_next (tmp), i++)
-		{
-			CONNMAN_LOG_USER("\t\t\tDNS %d - %s\n", i, (char *)tmp->data);
-		}
-		CONNMAN_LOG_USER("\t\tTime Servers\n");
-		for (i = 0, tmp = service->timeservers; tmp; tmp = g_slist_next (tmp), i++)
-		{
-			CONNMAN_LOG_USER("\t\t\tNTS %d - %s\n", i, (char *)tmp->data);
-		}
-		CONNMAN_LOG_USER("\t\tDomains\n");
-		for (i = 0, tmp = service->domains; tmp; tmp = g_slist_next (tmp), i++)
-		{
-			CONNMAN_LOG_USER("\t\t\tDOMAIN %d - %s\n", i, (char *)tmp->data);
-		}
-		CONNMAN_LOG_USER("************* End *************\n");
-	}
+  /* To print PROXY/DNS/NTP/DOMAIN servers*/
+  {
+    GSList *tmp = NULL;
+    int i = 0;
+    for (i = 0, tmp = service->proxy.servers; tmp; tmp = g_slist_next (tmp), i++)
+      {
+        CONNMAN_LOG_USER ("\t\t\tPROXY %d - %s\n", i, (char *) tmp->data);
+      }
+    CONNMAN_LOG_USER ("\t\tExcludes\n");
+    for (i = 0, tmp = service->proxy.exclude; tmp; tmp = g_slist_next (tmp), i++)
+      {
+        CONNMAN_LOG_USER ("\t\t\tEXCLUDE %d - %s\n", i, (char *) tmp->data);
+      }
+    CONNMAN_LOG_USER ("\t\tSecurity\n");
+    for (i = 0, tmp = service->security; tmp; tmp = g_slist_next (tmp), i++)
+      {
+        CONNMAN_LOG_USER ("\t\t\tSecurity %d - %s\n", i, (char *) tmp->data);
+      }
+    CONNMAN_LOG_USER ("\t\tDNS\n");
+    for (i = 0, tmp = service->nameservers; tmp; tmp = g_slist_next (tmp), i++)
+      {
+        CONNMAN_LOG_USER ("\t\t\tDNS %d - %s\n", i, (char *) tmp->data);
+      }
+    CONNMAN_LOG_USER ("\t\tTime Servers\n");
+    for (i = 0, tmp = service->timeservers; tmp; tmp = g_slist_next (tmp), i++)
+      {
+        CONNMAN_LOG_USER ("\t\t\tNTS %d - %s\n", i, (char *) tmp->data);
+      }
+    CONNMAN_LOG_USER ("\t\tDomains\n");
+    for (i = 0, tmp = service->domains; tmp; tmp = g_slist_next (tmp), i++)
+      {
+        CONNMAN_LOG_USER ("\t\t\tDOMAIN %d - %s\n", i, (char *) tmp->data);
+      }
+    CONNMAN_LOG_USER ("************* End *************\n");
+  }
 }
 
 CP_EXPORT void
-connman_proxy_util_print_g_variant(char *name, GVariant *val)
+connman_proxy_util_print_g_variant (char *name, GVariant *val)
 {
 #if defined(CONNMAN_LOG_LEVEL) && (CONNMAN_LOG_LEVEL > CONN_LOG_INFO)
-    static uint8_t depth_level = 0;
-    if(depth_level > MAX_DEPTH_LEVEL)
+  static uint8_t depth_level = 0;
+  if (depth_level > MAX_DEPTH_LEVEL)
     {
-        CONNMAN_LOG_WARNING("Print MAX_DEPTH_LEVEL is %d and we have reached to depth %d.. \n", MAX_DEPTH_LEVEL, depth_level);
-        return;
+      CONNMAN_LOG_WARNING ("Print MAX_DEPTH_LEVEL is %d and we have reached to depth %d.. \n", MAX_DEPTH_LEVEL, depth_level);
+      return;
     }
 
-    if(g_variant_type_equal(G_VARIANT_TYPE_BOOLEAN, g_variant_get_type(val)))
+  if (g_variant_type_equal (G_VARIANT_TYPE_BOOLEAN, g_variant_get_type (val)))
     {
-        CONNMAN_LOG_USER ("%s%-12s : %s\n", s_depth_tab_str+(MAX_DEPTH_LEVEL-depth_level), name, g_variant_get_boolean (val) ? "Yes" : "No");
+      CONNMAN_LOG_USER ("%s%-12s : %s\n", s_depth_tab_str + (MAX_DEPTH_LEVEL - depth_level), name, g_variant_get_boolean (val) ? "Yes" : "No");
     }
-    else if(g_variant_type_equal(G_VARIANT_TYPE_STRING, g_variant_get_type(val)))
+  else if (g_variant_type_equal (G_VARIANT_TYPE_STRING, g_variant_get_type (val)))
     {
-        CONNMAN_LOG_USER ("%s%-12s : %s\n", s_depth_tab_str+(MAX_DEPTH_LEVEL-depth_level), name, g_variant_get_string (val, NULL));
+      CONNMAN_LOG_USER ("%s%-12s : %s\n", s_depth_tab_str + (MAX_DEPTH_LEVEL - depth_level), name, g_variant_get_string (val, NULL));
     }
-    else if(g_variant_type_equal(G_VARIANT_TYPE_BYTE, g_variant_get_type(val)))
+  else if (g_variant_type_equal (G_VARIANT_TYPE_BYTE, g_variant_get_type (val)))
     {
-        CONNMAN_LOG_USER ("%s%-12s : %"PRIu8"\n", s_depth_tab_str+(MAX_DEPTH_LEVEL-depth_level), name, g_variant_get_byte (val));
+      CONNMAN_LOG_USER ("%s%-12s : %" PRIu8 "\n", s_depth_tab_str + (MAX_DEPTH_LEVEL - depth_level), name, g_variant_get_byte (val));
     }
-    else if(g_variant_type_equal(G_VARIANT_TYPE_UINT16, g_variant_get_type(val)))
+  else if (g_variant_type_equal (G_VARIANT_TYPE_UINT16, g_variant_get_type (val)))
     {
-        CONNMAN_LOG_USER ("%s%-12s : %"PRIu16"\n", s_depth_tab_str+(MAX_DEPTH_LEVEL-depth_level), name, g_variant_get_uint16 (val));
+      CONNMAN_LOG_USER ("%s%-12s : %" PRIu16 "\n", s_depth_tab_str + (MAX_DEPTH_LEVEL - depth_level), name, g_variant_get_uint16 (val));
     }
-    else if(g_variant_type_equal(G_VARIANT_TYPE_STRING_ARRAY, g_variant_get_type(val)))
+  else if (g_variant_type_equal (G_VARIANT_TYPE_STRING_ARRAY, g_variant_get_type (val)))
     {
-        CONNMAN_LOG_USER ("%s%s {\n", s_depth_tab_str+(MAX_DEPTH_LEVEL-depth_level), name);
-        depth_level++;
-        connman_proxy_util_print_array_of_string(val);
-        depth_level--;
-        CONNMAN_LOG_USER ("%s}\n", s_depth_tab_str+(MAX_DEPTH_LEVEL-depth_level));
-
+      CONNMAN_LOG_USER ("%s%s {\n", s_depth_tab_str + (MAX_DEPTH_LEVEL - depth_level), name);
+      depth_level++;
+      connman_proxy_util_print_array_of_string (val);
+      depth_level--;
+      CONNMAN_LOG_USER ("%s}\n", s_depth_tab_str + (MAX_DEPTH_LEVEL - depth_level));
     }
-    else if(g_variant_type_equal(G_VARIANT_TYPE_VARDICT, g_variant_get_type(val)))
+  else if (g_variant_type_equal (G_VARIANT_TYPE_VARDICT, g_variant_get_type (val)))
     {
-        CONNMAN_LOG_USER ("%s%s {\n", s_depth_tab_str+(MAX_DEPTH_LEVEL-depth_level), name);
-        depth_level++;
-        connman_proxy_util_print_array_of_dict(val);
-        depth_level--;
-        CONNMAN_LOG_USER ("%s}\n", s_depth_tab_str+(MAX_DEPTH_LEVEL-depth_level));
+      CONNMAN_LOG_USER ("%s%s {\n", s_depth_tab_str + (MAX_DEPTH_LEVEL - depth_level), name);
+      depth_level++;
+      connman_proxy_util_print_array_of_dict (val);
+      depth_level--;
+      CONNMAN_LOG_USER ("%s}\n", s_depth_tab_str + (MAX_DEPTH_LEVEL - depth_level));
     }
-    else
+  else
     {
-        connman_proxy_util_print_custom(val);
+      connman_proxy_util_print_custom (val);
     }
-#endif /* CONNMAN_LOG_LEVEL > CONN_LOG_ERROR */    
-    return;
+#endif /* CONNMAN_LOG_LEVEL > CONN_LOG_ERROR */
+  return;
 }

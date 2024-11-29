@@ -22,78 +22,79 @@
  */
 
 #define _GNU_SOURCE
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
-#include <unistd.h>
 #include <termio.h>
+#include <unistd.h>
 
 #include "connman_proxy.h"
 
 static int s_stdin_fd = -1;
 static struct termios s_original;
 
-void connman_init_keyboard_input(connman_proxy_handler_t *connman_proxy_handler);
-void connman_reset_keyboard_input(void);
-gboolean connman_key_is_pressed(int32_t *character);
+void connman_init_keyboard_input (connman_proxy_handler_t *connman_proxy_handler);
+void connman_reset_keyboard_input (void);
+gboolean connman_key_is_pressed (int32_t *character);
 
-gboolean connman_key_is_pressed(int32_t *character)
+gboolean
+connman_key_is_pressed (int32_t *character)
 {
-    int characters_buffered = 0;
-    gboolean pressed = FALSE;
+  int characters_buffered = 0;
+  gboolean pressed = FALSE;
 
-    if(character == NULL)
+  if (character == NULL)
     {
-        CONNMAN_LOG_WARNING("Invalid Argument\n");
-        return pressed;
+      CONNMAN_LOG_WARNING ("Invalid Argument\n");
+      return pressed;
     }
 
-    /*Get the number of characters that are waiting to be read*/
-    ioctl(s_stdin_fd, FIONREAD, &characters_buffered);
-    pressed = (characters_buffered != 0);
+  /*Get the number of characters that are waiting to be read*/
+  ioctl (s_stdin_fd, FIONREAD, &characters_buffered);
+  pressed = (characters_buffered != 0);
 
-    if (characters_buffered == 1)
-        *character = fgetc(stdin);
-    else if(characters_buffered > 0)
-        fflush(stdin);
+  if (characters_buffered == 1)
+    *character = fgetc (stdin);
+  else if (characters_buffered > 0)
+    fflush (stdin);
 
-    return pressed;
+  return pressed;
 }
 
 void
-connman_init_keyboard_input(connman_proxy_handler_t *connman_proxy_handler)
+connman_init_keyboard_input (connman_proxy_handler_t *connman_proxy_handler)
 {
-    struct termios term;
+  struct termios term;
 
-    CONNMAN_PROXY_UNUSED(connman_proxy_handler);
-    if (s_stdin_fd == -1)
+  CONNMAN_PROXY_UNUSED (connman_proxy_handler);
+  if (s_stdin_fd == -1)
     {
-        s_stdin_fd = fileno(stdin);
+      s_stdin_fd = fileno (stdin);
 
-        /*Get the terminal (termios) attritubets for stdin*/
-        tcgetattr(s_stdin_fd, &s_original);
+      /*Get the terminal (termios) attritubets for stdin*/
+      tcgetattr (s_stdin_fd, &s_original);
 
-        /*Copy the termios attributes so we can modify them*/
-        memcpy(&term, &s_original, sizeof(term));
+      /*Copy the termios attributes so we can modify them*/
+      memcpy (&term, &s_original, sizeof (term));
 
-        /*Unset ICANON and ECHO for stdin*/
-        term.c_lflag &= (tcflag_t)~(ICANON|ECHO);
-        tcsetattr(s_stdin_fd, TCSANOW, &term);
+      /*Unset ICANON and ECHO for stdin*/
+      term.c_lflag &= (tcflag_t) ~(ICANON | ECHO);
+      tcsetattr (s_stdin_fd, TCSANOW, &term);
 
-        /*Turn off buffering for stdin*/
-        setbuf(stdin, NULL);
+      /*Turn off buffering for stdin*/
+      setbuf (stdin, NULL);
     }
-    return;
+  return;
 }
 
 void
-connman_reset_keyboard_input()
+connman_reset_keyboard_input ()
 {
-    if(s_stdin_fd != -1)
+  if (s_stdin_fd != -1)
     {
-        tcsetattr(s_stdin_fd, TCSANOW, &s_original);
-        s_stdin_fd = -1;
+      tcsetattr (s_stdin_fd, TCSANOW, &s_original);
+      s_stdin_fd = -1;
     }
-    return;
+  return;
 }
