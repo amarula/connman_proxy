@@ -22,6 +22,7 @@
  */
 
 #define _GNU_SOURCE
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,6 +46,8 @@
       CONNMAN_PROXY_FREE_STR_GLIST (clock_obj->timeservers);                                           \
       CONNMAN_VAR_GET_STR_ARRAY (value, clock_obj->timeservers)                                        \
     }                                                                                                  \
+  else if (strcmp (key, CONNMAN_PROP_TIMESERVERSYNCED_STR) == 0)                                       \
+    CONNMAN_VAR_GET_BOOL (value, clock_obj->timeservers_synced)                                        \
   else                                                                                                 \
     {                                                                                                  \
       CONNMAN_LOG_WARNING ("Unknown Property : %s Type %s\n", key, g_variant_get_type_string (value)); \
@@ -84,7 +87,6 @@ s_connman_proxy_parse_clock_properties (connman_proxy_handler_t *connman_proxy_h
   g_variant_iter_init (&iter, res);
   while (g_variant_iter_next (&iter, "{sv}", &key, &value))
     {
-      CONNMAN_LOG_INFO ("RICCHI - %s \n", key);
       CONNMAN_PROXY_CLOCK_PARSE_PROPERTY (connman_proxy_handler->clock, key, value);
 
       /*must free data for ourselves*/
@@ -272,6 +274,7 @@ connman_proxy_clock_property_changed_cb (NetConnmanClock *object, char *name, GV
       strncpy (notify_data->data.clock.time_updates, connman_proxy_handler->clock->time_updates, sizeof (notify_data->data.clock.time_updates));
       notify_data->data.clock.timezone = connman_proxy_handler->clock->timezone ? g_strdup (connman_proxy_handler->clock->timezone) : NULL;
       strncpy (notify_data->data.clock.timezone_updates, connman_proxy_handler->clock->timezone_updates, sizeof (notify_data->data.clock.timezone_updates));
+      notify_data->data.clock.timeservers_synced = connman_proxy_handler->clock->timeservers_synced;
 
       connman_proxy_handler->cb->on_update (notify_data, connman_proxy_handler->cb->cookie);
     }

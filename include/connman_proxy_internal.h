@@ -78,6 +78,7 @@
 #define CONNMAN_PROP_TIMEUPDATES_STR "TimeUpdates"
 #define CONNMAN_PROP_TIMEZONE_STR "Timezone"
 #define CONNMAN_PROP_TIMEZONEUPDATES_STR "TimezoneUpdates"
+#define CONNMAN_PROP_TIMESERVERSYNCED_STR "TimeserverSynced"
 
 #define CONNMAN_PROXY_SAFE_FREE(ptr) \
   if (ptr != NULL)                   \

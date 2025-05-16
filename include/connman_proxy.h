@@ -188,11 +188,12 @@ extern "C"
    */
   typedef struct
   {
-    guint time;                 /**< Current system time in seconds since epoch. */
-    gchar time_updates[16];     /**< Possible values are "manual" and "auto" to indicate time update policy */
-    gchar *timezone;            /**< Current system timezone string */
-    gchar timezone_updates[16]; /**< Possible values are "manual" and "auto" to indicate time update policy */
-    GSList *timeservers;        /**< The list of Time servers */
+    guint time;                  /**< Current system time in seconds since epoch. */
+    gchar time_updates[16];      /**< Possible values are "manual" and "auto" to indicate time update policy */
+    gchar *timezone;             /**< Current system timezone string */
+    gchar timezone_updates[16];  /**< Possible values are "manual" and "auto" to indicate timezone update policy */
+    GSList *timeservers;         /**< The list of Time servers */
+    gboolean timeservers_synced; /**< This value indicates if the current system time is synced via NTP servers. */
   } connman_proxy_clock_info_t;
 
   /**
